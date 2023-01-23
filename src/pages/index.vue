@@ -5,7 +5,9 @@ const text = ref('')
 
 <template>
   <div>
-    <h1>Pages/index.vue</h1>
+    <h1 data-testid="page-title">
+      Pages/index.vue
+    </h1>
     <BaseTextInput v-model="text" />
     <p>Input value = {{ text }}</p>
   </div>
