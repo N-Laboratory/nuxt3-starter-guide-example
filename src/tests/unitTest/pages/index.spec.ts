@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest'
-import { render } from '@testing-library/vue'
+import { fireEvent, render } from '@testing-library/vue'
 import Index from '~/pages/index.vue'
 
 describe('Index', () => {
@@ -12,5 +12,17 @@ describe('Index', () => {
 
     // Assert
     expect(title).toBe('Pages/index.vue')
+  })
+
+  test('Input value should emit', async () => {
+    // Arrange
+    const { container } = render(Index)
+    const input = container.querySelector('[data-testid="text-input"]') as HTMLInputElement
+
+    // Act
+    await fireEvent.update(input, 'Test')
+
+    // Assert
+    expect(input.value).toBe('Test')
   })
 })
