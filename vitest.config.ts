@@ -20,7 +20,7 @@ export default defineConfig({
     coverage: {
       provider: 'c8',
       include: ['src/**/*.{vue,js,ts}'],
-      all: true,
+      all: false,
       reporter: ['html', 'clover', 'text']
     },
     root: '.',
