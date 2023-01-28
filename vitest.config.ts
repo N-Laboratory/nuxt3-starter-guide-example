@@ -27,6 +27,7 @@ export default defineConfig({
     globals: true,
     environment: 'happy-dom',
     reporters: ['verbose', 'vitest-sonar-reporter'],
-    outputFile: 'test-report.xml'
+    outputFile: 'test-report.xml',
+    setupFiles: './src/tests/unitTest/setup.ts'
   }
 })
