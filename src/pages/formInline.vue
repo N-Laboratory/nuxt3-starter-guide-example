@@ -1,8 +1,13 @@
 <script lang="ts" setup>
 import { Form, Field, ErrorMessage } from 'vee-validate'
+import { useUserStore } from '../store/user'
+
+const router = useRouter()
+const store = useUserStore()
 
 const submit = (values: Record<string, any>) => {
-  console.log(values.email, values.password)
+  store.setUserInfo(values.email, values.password)
+  router.push('/myPage')
 }
 </script>
 

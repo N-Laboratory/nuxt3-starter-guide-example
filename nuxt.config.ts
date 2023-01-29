@@ -5,5 +5,17 @@ export default defineNuxtConfig({
     shim: false,
     strict: true,
     typeCheck: true
-  }
+  },
+  modules: [
+    ['@pinia/nuxt',
+      {
+        autoImports: [
+          // defineStoreの自動インポート
+          'defineStore'
+        ]
+        // If you need to use vuex and pinia, add following option.
+        // disableVuex: false ,
+      }
+    ]
+  ]
 })

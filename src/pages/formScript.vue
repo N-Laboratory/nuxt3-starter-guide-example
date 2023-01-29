@@ -1,5 +1,9 @@
 <script lang="ts" setup>
 import { useForm, useField } from 'vee-validate'
+import { useUserStore } from '../store/user'
+
+const router = useRouter()
+const store = useUserStore()
 
 const { handleSubmit, errors, isSubmitting, meta } = useForm({
   validationSchema: {
@@ -12,7 +16,8 @@ const { value: password } = useField('password')
 const { value: email } = useField('email')
 
 const submit = handleSubmit(() => {
-  console.log(email.value, password.value)
+  store.setUserInfo(email.value as string, password.value as string)
+  router.push('/myPage')
 })
 </script>
 
