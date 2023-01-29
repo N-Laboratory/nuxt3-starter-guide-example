@@ -7,7 +7,7 @@ export default defineConfig({
   plugins: [
     Vue(),
     AutoImport({
-      imports: ['vue']
+      imports: ['vue', 'vue-router']
     })
   ],
   resolve: {

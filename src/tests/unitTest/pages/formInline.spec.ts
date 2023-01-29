@@ -1,11 +1,27 @@
-import { describe, expect, test, vi } from 'vitest'
+import { beforeEach, describe, expect, test, vi } from 'vitest'
 import { fireEvent, render } from '@testing-library/vue'
+import { setActivePinia, createPinia } from 'pinia'
 import { waitPerfectly } from '../setup'
 import Form from '~/pages/formInline.vue'
 
 vi.useFakeTimers()
 
+const mockPush = vi.fn()
+
+vi.mock('vue-router', () => ({
+  useRouter: () => ({
+    push: mockPush
+  })
+}))
+
 describe('Form', () => {
+  beforeEach(() => {
+    // creates a fresh pinia and make it active so it's automatically picked
+    // up by any useStore() call without having to pass it to it:
+    // `useStore(pinia)`
+    setActivePinia(createPinia())
+  })
+
   describe('initial check', () => {
     test('page should render', () => {
       // Arrange
@@ -121,6 +137,7 @@ describe('Form', () => {
 
       // Assert
       expect(submitFn).toHaveBeenCalledOnce()
+      expect(mockPush).toHaveBeenCalledWith('/myPage')
     })
   })
 })
