@@ -17,6 +17,7 @@
   },
   "devDependencies": {
     "@nuxtjs/eslint-config-typescript": "^12.0.0",
+    "@pinia/testing": "^0.0.14",
     "@testing-library/vue": "^6.6.1",
     "@vee-validate/i18n": "^4.7.3",
     "@vee-validate/rules": "^4.7.3",
