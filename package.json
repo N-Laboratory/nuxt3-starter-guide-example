@@ -1,7 +1,8 @@
 {
   "private": true,
   "config": {
-    "path": "./src/tests/unitTest/pages/formScript.spec.ts"
+    "path": "./src/tests/unitTest/pages/formScript.spec.ts",
+    "token": "sqp_5ee8e446712b8c617289c6ed2ca0fd3f7c26d4be"
   },
   "scripts": {
     "build": "nuxt build",
@@ -11,9 +12,11 @@
     "postinstall": "nuxt prepare",
     "lint": "eslint --ext \".js,.ts,.vue\" --ignore-path .gitignore .",
     "lint:fix": "npm run lint -- --fix",
-    "test:all": "vitest --coverage --dir ./src/tests/unitTest",
+    "test:all": "vitest --coverage",
     "test:linux": "vitest --coverage $npm_package_config_path",
-    "test:win": "vitest --coverage %npm_package_config_path%"
+    "test:win": "vitest --coverage %npm_package_config_path%",
+    "sonar:linux": "sonar-scanner -Dsonar.login=$npm_package_config_token",
+    "sonar:win": "sonar-scanner -Dsonar.login=%npm_package_config_token%"
   },
   "devDependencies": {
     "@nuxtjs/eslint-config-typescript": "^12.0.0",
@@ -27,6 +30,7 @@
     "happy-dom": "^8.1.5",
     "nuxt": "^3.0.0",
     "puppeteer": "^19.6.2",
+    "sonarqube-scanner": "^3.0.0",
     "typescript": "^4.9.4",
     "unplugin-auto-import": "^0.12.1",
     "vee-validate": "^4.7.3",

@@ -1,5 +1,51 @@
 <testExecutions version="1">
+  <file path="src/tests/e2eTest/spec/formInline.spec.ts">
+    <testCase name="Index - initial check - 1-submit button should be disabled" duration="1105" />
+    <testCase name="Index - form validation check - 2:the email field is required" duration="1460" />
+    <testCase name="Index - form validation check - 3:the password field is required" duration="1417" />
+    <testCase name="Index - form validation check - 4-the email field should be a valid email" duration="2119" />
+    <testCase name="Index - form validation check - 5-if click submit button, page should go to myPage" duration="5756" />
+  </file>
+  <file path="src/tests/e2eTest/spec/formScript.spec.ts">
+    <testCase name="Index - initial check - 1-submit button should be disabled" duration="3781" />
+    <testCase name="Index - form validation check - 2:the email field is required" duration="5440" />
+    <testCase name="Index - form validation check - 3:the password field is required" duration="3431" />
+    <testCase name="Index - form validation check - 4-the email field should be a valid email" duration="1948" />
+    <testCase name="Index - form validation check - 5-if click submit button, page should go to myPage" duration="5832" />
+  </file>
+  <file path="src/tests/unitTest/middleware/redirect.global.spec.ts">
+    <testCase name="RedirectMiddleware - If you access [/]、 you should redirect [formScript]" duration="2" />
+    <testCase name="RedirectMiddleware - If you access [/myPage]、 you should redirect [formScript]" duration="0" />
+    <testCase name="RedirectMiddleware - If you access [formInline]、 you should not redirect [formScript]" duration="1" />
+  </file>
+  <file path="src/tests/unitTest/pages/formInline.spec.ts">
+    <testCase name="Form - initial check - page should render" duration="39" />
+    <testCase name="Form - initial check - submit button should be disabled" duration="10" />
+    <testCase name="Form - vee-validate testing - the email field is required" duration="11" />
+    <testCase name="Form - vee-validate testing - the password field is required" duration="7" />
+    <testCase name="Form - vee-validate testing - the email field should be a valid email" duration="9" />
+    <testCase name="Form - vee-validate testing - if all field is valid、submit button should be enabled" duration="6" />
+    <testCase name="Form - vee-validate testing - if click submit button, submission function should run" duration="6" />
+  </file>
+  <file path="src/tests/unitTest/pages/formScript.spec.ts">
+    <testCase name="Form - initial check - page should render" duration="31" />
+    <testCase name="Form - initial check - submit button should be disabled" duration="7" />
+    <testCase name="Form - vee-validate testing - the email field is required" duration="5" />
+    <testCase name="Form - vee-validate testing - the password field is required" duration="9" />
+    <testCase name="Form - vee-validate testing - the email field should be a valid email" duration="5" />
+    <testCase name="Form - vee-validate testing - if all field is valid、submit button should be enabled" duration="6" />
+    <testCase name="Form - vee-validate testing - if click submit button, submission function should run" duration="5" />
+  </file>
   <file path="src/tests/unitTest/pages/index.spec.ts">
-    <testCase name="Index - Index page should render page title" duration="10" />
+    <testCase name="Index - Index page should render page title" duration="17" />
+    <testCase name="Index - Input value should emit" duration="7" />
+  </file>
+  <file path="src/tests/unitTest/pages/myPage.spec.ts">
+    <testCase name="Mypage - page should render" duration="20" />
+    <testCase name="Mypage - email and password should be set from store user info." duration="3" />
+  </file>
+  <file path="src/tests/unitTest/store/user.spec.ts">
+    <testCase name="Store - store user info should be initial state" duration="2" />
+    <testCase name="Store - if you call setUserInfo(), store user info should update" duration="1" />
   </file>
 </testExecutions>

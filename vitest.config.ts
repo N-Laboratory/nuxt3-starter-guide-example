@@ -21,7 +21,7 @@ export default defineConfig({
       provider: 'c8',
       include: ['src/**/*.{vue,js,ts}'],
       all: false,
-      reporter: ['html', 'clover', 'text']
+      reporter: ['html', 'clover', 'text', 'lcov']
     },
     root: '.',
     globals: true,
