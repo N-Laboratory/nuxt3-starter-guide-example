@@ -1,8 +1,7 @@
 {
   "private": true,
   "config": {
-    "path": "./src/tests/unitTest/pages/formScript.spec.ts",
-    "token": "sqp_5ee8e446712b8c617289c6ed2ca0fd3f7c26d4be"
+    "path": "./src/tests/unitTest/pages/formScript.spec.ts"
   },
   "scripts": {
     "build": "nuxt build",
@@ -15,8 +14,7 @@
     "test:all": "vitest --coverage",
     "test:linux": "vitest --coverage $npm_package_config_path",
     "test:win": "vitest --coverage %npm_package_config_path%",
-    "sonar:linux": "sonar-scanner -Dsonar.login=$npm_package_config_token",
-    "sonar:win": "sonar-scanner -Dsonar.login=%npm_package_config_token%"
+    "sonar": "sonar-scanner"
   },
   "devDependencies": {
     "@nuxtjs/eslint-config-typescript": "^12.0.0",
