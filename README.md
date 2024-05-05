@@ -18,6 +18,9 @@
     <img src="https://img.shields.io/badge/-FollowMyAccount-grey.svg?logo=github&style=flat">
   </a>
 </p>
+<a href="https://github.com/N-Laboratory/nuxt3-starter-guide-example-jpn" target="_blank">
+  日本語版はこちら
+</a>
 
 This project is a template nuxt3 project.
 
