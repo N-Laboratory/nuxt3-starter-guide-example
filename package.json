@@ -17,7 +17,6 @@
     "sonar": "sonar-scanner"
   },
   "devDependencies": {
-    "@nuxtjs/eslint-config-typescript": "^12.1.0",
     "@pinia/testing": "^0.1.3",
     "@testing-library/vue": "^8.1.0",
     "@vee-validate/i18n": "^4.13.1",
