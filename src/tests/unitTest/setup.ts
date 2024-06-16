@@ -1,10 +1,10 @@
 import { localize } from '@vee-validate/i18n'
 import en from '@vee-validate/i18n/dist/locale/en.json'
-import AllRules from '@vee-validate/rules'
+import { all } from '@vee-validate/rules';
 import { defineRule, configure } from 'vee-validate'
 import { vi } from 'vitest'
 import flushPromises from 'flush-promises'
-import { RouteLocationNormalized, NavigationGuard } from 'vue-router'
+import type { RouteLocationNormalized, NavigationGuard } from 'vue-router'
 
 // stub defineNuxtRouteMiddleware
 interface RedirectMiddleware {
@@ -24,8 +24,8 @@ configure({
 })
 
 // import vee-validate all rules
-Object.keys(AllRules).forEach((rule) => {
-  defineRule(rule, AllRules[rule])
+Object.entries(all).forEach(([name, rule]) => {
+  defineRule(name, rule)
 })
 
 // Call this method after you called fireEvent.
