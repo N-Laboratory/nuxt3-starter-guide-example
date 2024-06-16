@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, test, vi } from 'vitest'
-import { fireEvent, render } from '@testing-library/vue'
+import { fireEvent, render, screen } from '@testing-library/vue'
 import { setActivePinia, createPinia } from 'pinia'
 import { waitPerfectly } from '../setup'
 import Form from '~/pages/formInline.vue'
@@ -25,10 +25,10 @@ describe('Form', () => {
   describe('initial check', () => {
     test('page should render', () => {
       // Arrange
-      const { container } = render(Form)
+      render(Form)
 
       // You need to call trim() because textContent return text with spaces added back and forth.
-      const title = container.querySelector('[data-testid="page-title"]')?.textContent?.trim()
+      const title = screen.getByTestId('page-title')?.textContent?.trim()
 
       // Assert
       expect(title).toBe('Login')
@@ -36,11 +36,11 @@ describe('Form', () => {
 
     test('submit button should be disabled', async () => {
       // Arrange
-      const { container } = render(Form)
+      render(Form)
 
       // You have to call flushPromises after render() called because HTMLButtonElement.disabled always return false in the initial state.
       await waitPerfectly()
-      const isDisabled = (container.querySelector('[data-testid="submit-btn"]') as HTMLButtonElement).disabled
+      const isDisabled = (screen.getByTestId('submit-btn') as HTMLButtonElement).disabled
 
       // Assert
       expect(isDisabled).toBeTruthy()
@@ -57,14 +57,14 @@ describe('Form', () => {
         inputName
       ) => {
         // Arrange
-        const { container } = render(Form)
-        const inputElement = container.querySelector(`[data-testid="input-${inputName}"]`) as HTMLInputElement
+        render(Form)
+        const inputElement = screen.getByTestId(`input-${inputName}`) as HTMLInputElement
 
         // Act
         await fireEvent.update(inputElement, '')
         await fireEvent.blur(inputElement)
         await waitPerfectly()
-        const errorMsg = container.querySelector(`[data-testid="${inputName}-error-msg"]`)?.textContent
+        const errorMsg = screen.getByTestId(`${inputName}-error-msg`)?.textContent
 
         // Assert
         expect(errorMsg).toBe(`The ${inputName} field is required`)
@@ -72,18 +72,18 @@ describe('Form', () => {
 
     test('the email field should be a valid email', async () => {
       // Arrange
-      const { container } = render(Form)
-      const inputElement = container.querySelector('[data-testid="input-email"]') as HTMLInputElement
+      render(Form)
+      const inputElement = screen.getByTestId('input-email') as HTMLInputElement
       // Act
       await fireEvent.update(inputElement, 'abc')
       await fireEvent.blur(inputElement)
       await waitPerfectly()
-      const errorMsgInputInvalidValue = container.querySelector('[data-testid="email-error-msg"]')?.textContent
+      const errorMsgInputInvalidValue = screen.getByTestId('email-error-msg')?.textContent
 
       await fireEvent.update(inputElement, 'abc@abc.com')
       await fireEvent.blur(inputElement)
       await waitPerfectly()
-      const errorMsgInputValidValue = container.querySelector('[data-testid="email-error-msg"]')?.textContent
+      const errorMsgInputValidValue = screen.queryByTestId('email-error-msg')
 
       // Assert
       expect(errorMsgInputInvalidValue).toBe('The email field must be a valid email')
@@ -92,21 +92,21 @@ describe('Form', () => {
 
     test('if all field is valid、submit button should be enabled', async () => {
       // Arrange
-      const { container } = render(Form)
+      render(Form)
       // You have to call flushPromises after render() called because HTMLButtonElement.disabled always return false in the initial state.
       await waitPerfectly()
 
       // Act
-      const emailInputElement = container.querySelector('[data-testid="input-email"]') as HTMLInputElement
+      const emailInputElement = screen.getByTestId('input-email') as HTMLInputElement
       await fireEvent.update(emailInputElement, 'abc@abc.com')
       await waitPerfectly()
 
-      const passwordInputElement = container.querySelector('[data-testid="input-password"]') as HTMLInputElement
+      const passwordInputElement = screen.getByTestId('input-password') as HTMLInputElement
       await fireEvent.update(passwordInputElement, '123')
       await waitPerfectly()
 
-      const submitElement = container.querySelector('[data-testid="submit-btn"]') as HTMLButtonElement
-      const form = container.querySelector('[data-testid=validation-form"]') as HTMLFormElement
+      const submitElement = screen.getByTestId('submit-btn') as HTMLButtonElement
+      const form = screen.getByTestId('validation-form') as HTMLFormElement
       form.dispatchEvent(new Event('submit'))
       await waitPerfectly()
 
@@ -118,20 +118,20 @@ describe('Form', () => {
       const submitFn = vi.fn()
 
       // Arrange
-      const { container } = render(Form, { global: { mocks: { submit: submitFn } } })
+      render(Form, { global: { mocks: { submit: submitFn } } })
 
-      const emailInputElement = container.querySelector('[data-testid="input-email"]') as HTMLInputElement
+      const emailInputElement = screen.getByTestId('input-email') as HTMLInputElement
       await fireEvent.update(emailInputElement, 'abc@abc.com')
       await fireEvent.blur(emailInputElement)
       await waitPerfectly()
 
-      const passwordInputElement = container.querySelector('[data-testid="input-password"]') as HTMLInputElement
+      const passwordInputElement = screen.getByTestId('input-password') as HTMLInputElement
       await fireEvent.update(passwordInputElement, '123')
       await fireEvent.blur(passwordInputElement)
       await waitPerfectly()
 
       // Act
-      const form = container.querySelector('[data-testid=validation-form"]') as HTMLFormElement
+      const form = screen.getByTestId('validation-form') as HTMLFormElement
       form.dispatchEvent(new Event('submit'))
       await waitPerfectly()
 
