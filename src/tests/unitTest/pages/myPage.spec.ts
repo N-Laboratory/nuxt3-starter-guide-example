@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, test} from 'vitest'
+import { beforeEach, describe, expect, test } from 'vitest'
 import { render, screen } from '@testing-library/vue'
 import { setActivePinia, createPinia } from 'pinia'
 import { createTestingPinia } from '@pinia/testing'
@@ -30,11 +30,11 @@ describe('Mypage', () => {
         plugins: [
           createTestingPinia({
             initialState: {
-              user: { user: { email: 'Initial email', password: 'Initial password' } }
-            }
-          })
-        ]
-      }
+              user: { user: { email: 'Initial email', password: 'Initial password' } },
+            },
+          }),
+        ],
+      },
     })
 
     const email = screen.getByTestId('page-email')?.textContent

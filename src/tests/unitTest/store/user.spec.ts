@@ -4,11 +4,11 @@ import { useUserStore } from '../../../store/user'
 
 const initialUser = {
   email: '',
-  password: ''
+  password: '',
 }
 const updatedUser = {
   email: 'new email',
-  password: 'new password'
+  password: 'new password',
 }
 
 describe('Store', () => {

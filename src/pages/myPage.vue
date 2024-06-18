@@ -14,10 +14,16 @@ const password = store.user.password
       </h1>
       <div>
         <div class="field">
-          Email: <span data-testid="page-email" v-text="email" />
+          Email: <span
+            data-testid="page-email"
+            v-text="email"
+          />
         </div>
         <div class="field">
-          Password: <span data-testid="page-password" v-text="password" />
+          Password: <span
+            data-testid="page-password"
+            v-text="password"
+          />
         </div>
       </div>
     </div>

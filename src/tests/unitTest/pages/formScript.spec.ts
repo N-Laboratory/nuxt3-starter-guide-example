@@ -10,8 +10,8 @@ const mockPush = vi.fn()
 
 vi.mock('vue-router', () => ({
   useRouter: () => ({
-    push: mockPush
-  })
+    push: mockPush,
+  }),
 }))
 
 describe('Form', () => {
@@ -50,11 +50,11 @@ describe('Form', () => {
   describe('vee-validate testing', () => {
     test.each([
       ['email'],
-      ['password']
+      ['password'],
     ])(
       'the %s field is required',
       async (
-        inputName
+        inputName,
       ) => {
         // Arrange
         render(Form)

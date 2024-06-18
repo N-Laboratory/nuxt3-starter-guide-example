@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest'
-import { fireEvent, render,screen } from '@testing-library/vue'
+import { fireEvent, render, screen } from '@testing-library/vue'
 import Index from '~/pages/index.vue'
 
 describe('Index', () => {

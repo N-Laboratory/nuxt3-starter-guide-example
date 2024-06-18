@@ -8,8 +8,8 @@ const store = useUserStore()
 const { handleSubmit, errors, isSubmitting, meta } = useForm({
   validationSchema: {
     email: 'required|email',
-    password: 'required'
-  }
+    password: 'required',
+  },
 })
 
 const { value: password } = useField('password')
@@ -37,7 +37,11 @@ const submit = handleSubmit(() => {
             placeholder="email"
             data-testid="input-email"
           >
-          <span v-if="errors.email" class="message invalid" data-testid="email-error-msg">{{ errors.email }}</span>
+          <span
+            v-if="errors.email"
+            class="message invalid"
+            data-testid="email-error-msg"
+          >{{ errors.email }}</span>
         </div>
         <div class="field">
           <input
@@ -48,7 +52,11 @@ const submit = handleSubmit(() => {
             placeholder="password"
             data-testid="input-password"
           >
-          <span v-if="errors.password" class="message invalid" data-testid="password-error-msg">{{ errors.password }}</span>
+          <span
+            v-if="errors.password"
+            class="message invalid"
+            data-testid="password-error-msg"
+          >{{ errors.password }}</span>
         </div>
         <div class="field">
           <!-- If the form submission function is being run, isSubmitting return true. -->
@@ -56,7 +64,7 @@ const submit = handleSubmit(() => {
           <!-- show detail https://vee-validate.logaretm.com/v4/api/use-form/#api-reference -->
           <button
             :disabled="isSubmitting || !meta.valid"
-            :class="{ 'btn-disabled' : isSubmitting || !meta.valid}"
+            :class="{ 'btn-disabled': isSubmitting || !meta.valid }"
             class="form-submit"
             data-testid="submit-btn"
             @click="submit"
