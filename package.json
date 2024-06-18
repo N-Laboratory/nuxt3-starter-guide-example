@@ -9,7 +9,7 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
-    "lint": "eslint --ext \".js,.ts,.vue\" --ignore-path .gitignore .",
+    "lint": "eslint .",
     "lint:fix": "npm run lint -- --fix",
     "test:all": "vitest --coverage",
     "test:linux": "vitest --coverage $npm_package_config_path",
@@ -17,6 +17,7 @@
     "sonar": "sonar-scanner"
   },
   "devDependencies": {
+    "@nuxt/eslint": "^0.3.13",
     "@pinia/testing": "^0.1.3",
     "@testing-library/vue": "^8.1.0",
     "@vee-validate/i18n": "^4.13.1",

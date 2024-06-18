@@ -4,18 +4,28 @@ export default defineNuxtConfig({
   typescript: {
     shim: false,
     strict: true,
-    typeCheck: false
+    typeCheck: false,
   },
   modules: [
     ['@pinia/nuxt',
       {
         autoImports: [
           // defineStoreの自動インポート
-          'defineStore'
-        ]
+          'defineStore',
+        ],
         // If you need to use vuex and pinia, add following option.
         // disableVuex: false ,
-      }
-    ]
-  ]
+      },
+    ],
+    '@nuxt/eslint',
+  ],
+  eslint: {
+    config: {
+      stylistic: {
+        indent: 2,
+        quotes: 'single',
+        semi: false,
+      },
+    },
+  },
 })
