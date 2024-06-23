@@ -4,7 +4,7 @@ export default defineNuxtConfig({
   typescript: {
     shim: false,
     strict: true,
-    typeCheck: false,
+    typeCheck: true,
   },
   modules: [
     ['@pinia/nuxt',
