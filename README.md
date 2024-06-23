@@ -22,14 +22,16 @@
   日本語版はこちら
 </a>
 
-This project is a template nuxt3 project.
+This project is a template nuxt 3 project compatible with nuxt 3.12.
+If your nuxt versions less than 3.12, please check here: https://github.com/N-Laboratory/nuxt3-starter-guide-example/releases/tag/v1.0
 
 The minimum required functions are implemented as a template project and the essentials are explained.
 This project also implement unit testing, E2E testing, and analyzing source code by SonarQube.
 
 This project implement the following.
 * Vitest (unit test)
-* EsLint
+* EsLint (Flat Config and Stylistic)
+* Migrate to Flat Config and Stylistic
 * VeeValidate
 * Navigation guard
 * Pinia
@@ -41,7 +43,9 @@ This project implement the following.
 
 1. [Create New Project](#create-new-project)
 1. [Typescript Setup](#typescript-setup)
-1. [EsLint Setup with Typescript](#eslint-setup-with-typescript)
+1. [EsLint Flat Config Setup](#eslint-flat-config-setup)
+1. [EsLint Stylistic Setup](#eslint-stylistic-setup)
+1. [Migrate To Flat Config And Stylistic](#migrate-to-flat-config-and-stylistic)
 1. [Vitest Setup](#vitest-setup)
 1. [VeeValidate Setup](#veevalidate-setup)
 1. [VeeValidate Testing](#veevalidate-testing)
@@ -53,9 +57,9 @@ This project implement the following.
 1. [Analyzing source code by SonarQube](#analyzing-source-code-by-sonarqube)
 
 ## Create [New Project](https://nuxt.com/docs/getting-started/installation#new-project)
-Run below command to create a new nuxt3 project.
+Run below command to create a new nuxt 3 project.
 ```bash
-npx nuxi init <project-name>
+npx nuxi@latest init <project-name>
 ```
 
 If you want to change source directory, add the following to nuxt.config.ts.
@@ -77,34 +81,98 @@ npm run dev
 You can access http://localhost:3000 to use this application.
 
 ## [Typescript](https://nuxt.com/docs/guide/concepts/typescript) Setup
+You may experience issues with the latest vue-tsc and vite-plugin-checker, used internally when type checking. For now, you may need to stay on v1 of vue-tsc.
+For more details, please see https://nuxt.com/docs/guide/concepts/typescript#type-checking
 ```bash
-# install Typescript
-npm install --save-dev typescript vue-tsc @types/node
+npm install --save-dev vue-tsc@^1 typescript
 ```
 
 Add typescript to nuxt.config.ts.
 ```ts
 // nuxt.config.ts
 export default defineNuxtConfig({
+  // For more about all the available options, please see https://nuxt.com/docs/api/nuxt-config#typescript
   typescript: {
-    shim: false,    // Generate shims file（If you use Volar in VSCode, set false）
-    strict: true,   // Enable strict mode
-    typeCheck: true // When run nuxt dev or nuxt build, run type check at the same time
+    // Enable type-checking at build time
+    typeCheck: true
   },
 });
 ```
 
-## [EsLint](https://github.com/nuxt/eslint-config) Setup with Typescript
-```bash
-# install ESlint
-npm install --save-dev @nuxtjs/eslint-config-typescript eslint
+If you had installed vue-tsc v2, an error will occur like below.
+https://github.com/vuejs/language-tools/issues/3969
+
+The only solution currently is to downgrade vue-tsc v1 or try following.
+```ts
+// nuxt.config.ts
+export default defineNuxtConfig({
+  typescript: {
+    // Change typeCheck to false to avoid above error.
+    typeCheck: false
+  },
+});
 ```
 
-Create .eslintrc in root directory and add the following to .eslintrc.
-```json
-{
-  "extends": [
-    "@nuxtjs/eslint-config-typescript"
+## EsLint [Flat Config](https://eslint.nuxt.com/packages/module) Setup
+The flat config format is the future of ESLint and is designed to be more flexible and project-aware.
+
+```bash
+npm install --save-dev @nuxt/eslint eslint
+```
+
+Add @nuxt/eslint to modules in nuxt.config.ts.
+```ts
+export default defineNuxtConfig({
+  modules: [
+    '@nuxt/eslint'
+  ],
+})
+```
+
+Create eslint.config.mjs in root directory and add the following.
+For more about all the available options, please see https://eslint.org/docs/latest/use/configure/configuration-files
+```js
+import withNuxt from './.nuxt/eslint.config.mjs'
+
+export default withNuxt(
+  {
+    // An array of glob patterns indicating the files that the configuration object should apply to.
+    files: ['**/*.ts', '**/*.tsx'],
+    // An array of glob patterns indicating the files that the configuration object should not apply to.
+    // Use ignores instead of --ignore-path.
+    ignores: ["**/*.config.ts"],
+    // An object containing the configured rules. When files or ignores are specified, these rule configurations are only available to the matching files.
+    rules: {
+      'no-console': 'off'
+    }
+  },
+  {
+    files: ['**/*.vue',],
+    rules: {
+      'no-console': 'error'
+    }
+  }
+)
+```
+
+Ignores has the following defined by default.
+
+https://github.com/nuxt/eslint/blob/main/packages/eslint-config/src/flat/configs/ignores.ts
+```ts
+import type { Linter } from 'eslint'
+
+export default function ignores(): Linter.FlatConfig[] {
+  return [
+    {
+      ignores: [
+        '**/dist',
+        '**/node_modules',
+        '**/.nuxt',
+        '**/.output',
+        '**/.vercel',
+        '**/.netlify',
+      ],
+    },
   ]
 }
 ```
@@ -113,8 +181,8 @@ Add the following item to scripts in package.json.
 ```json
 {
   "scripts": {
-    "lint": "eslint --ext \".js,.ts,.vue\" --ignore-path .gitignore .",
-    "lint:fix": "npm run lint -- --fix"
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
   }
 }
 ```
@@ -127,6 +195,170 @@ npm run lint
 # run ESLint + fix code
 npm run lint:fix
 ```
+
+### VS Code setup
+ESLint v9.x support was added in the ESLint VS Code extension (vscode-eslint) v3.0.10.
+
+In versions of vscode-eslint prior to v3.0.10, the new configuration system is not enabled by default. To enable support for the new configuration files, edit your .vscode/settings.json file and add the following:
+```json
+{
+  "eslint.experimental.useFlatConfig": true
+}
+```
+
+## ESLint [Stylistic](https://eslint.nuxt.com/packages/module#eslint-stylistic) Setup
+```bash
+npm install --save-dev @nuxt/eslint eslint
+```
+Nuxt integrate with ESLint Stylistic directly.
+
+Similar to the ESLint Module, you can opt-in by setting stylistic to true in the features module options.
+```ts
+export default defineNuxtConfig({
+  modules: [
+    // Add '@nuxt/eslint'
+    '@nuxt/eslint'
+  ],
+  eslint: {
+    config: {
+      stylistic: true
+    }
+  }
+})
+```
+You can also customize the rules.
+
+For more about all the available options, please see https://eslint.style/guide/config-presets#configuration-factory
+```ts
+export default defineNuxtConfig({
+  modules: [
+    '@nuxt/eslint'
+  ],
+  eslint: {
+    config: {
+      stylistic: {
+        indent: 2,
+        quotes: 'single',
+        semi: false,
+      },
+    }
+  }
+})
+```
+
+### Automatically format code on save with ESLint in VSCode
+Add the following to .vscode/setting.json
+```json
+{
+  "editor.formatOnSave": false,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+}
+```
+
+## Migrate To Flat Config And Stylistic
+This guide provides an overview of how you can migrate your ESLint configuration file from eslintrc and prettier to ESLint flat config and ESLint stylistic.
+For more details, please see https://eslint.org/docs/latest/use/configure/migration-guide
+
+
+First, install Nuxt ESLint.
+```bash
+npm install --save-dev @nuxt/eslint eslint
+```
+
+### Migrate from eslintrc to ESLint flat config
+Delete @nuxtjs/eslint-config-typescript.
+```bash
+npm uninstall @nuxtjs/eslint-config-typescript
+```
+Delete @nuxtjs/eslint-config-typescript in package.json.
+```diff
+"devDependencies": {
+- "@nuxtjs/eslint-config-typescript": "^12.1.0",
+},
+```
+
+Delete .eslintrc file.
+```diff
+- {
+-   "extends": [
+-     "@nuxtjs/eslint-config-typescript"
+-   ],
+-   "rules": {
+-     "no-console": "off"
+-   }
+- }
+```
+
+Create eslint.config.mjs file in you root directory.
+```js
+// eslint.config.mjs
+import withNuxt from './.nuxt/eslint.config.mjs'
+
+export default withNuxt(
+  {
+    files: ['**/*.js', '**/*.ts', '**/*.vue'],
+    // Use ignores instead of --ignore-path.
+    ignores: ['**/*.log*', '.cache/**'],
+    rules: {
+      'no-console': 'off',
+    },
+  },
+)
+```
+
+Modify npm scripts like below.
+```diff
+"scripts": {
+- lint: "eslint --ext \".js,.ts,.vue\" --ignore-path .gitignore .",
++ lint: "eslint .",
+},
+```
+
+### Migrate from prettier to ESLint stylistic
+Delete prettier and eslint-config-prettier, eslint-plugin-prettier.
+```bash
+npm uninstall prettier eslint-config-prettier eslint-plugin-prettier
+```
+Delete prettier and eslint-config-prettier, eslint-plugin-prettier in package.json.
+```diff
+"devDependencies": {
+- "eslint-plugin-prettier": "^5.1.0",
+- "eslint-config-prettier": "^8.3.0",
+- "prettier": "^2.5.1",
+},
+```
+
+Delete .prettierrc file.
+```diff
+- {
+-   "indent": 2,
+-   "quotes": 'single',
+-   "semi": false
+- }
+```
+
+Add rules to nuxt.config.ts
+```ts
+// nuxt.config.ts
+export default defineNuxtConfig({
+  modules: [
+    '@nuxt/eslint'
+  ],
+  eslint: {
+    config: {
+      stylistic: {
+        indent: 2,
+        quotes: 'single',
+        semi: false,
+      },
+    }
+  }
+})
+```
+Delete prettier commands from npm scripts in package.json.
+
 
 ## [Vitest](https://vitest.dev/) Setup
 
@@ -208,7 +440,7 @@ AutoImport({
 
 ### Collect coverage
 ```bash
-npm install --save-dev @vitest/coverage-c8 vitest-sonar-reporter
+npm install --save-dev @vitest/coverage-v8 vitest-sonar-reporter
 ```
 
 Add the following to vitest.config.ts.
@@ -217,7 +449,7 @@ Add the following to vitest.config.ts.
 export default defineConfig({
   test: {
     coverage: {
-      provider: 'c8',
+      provider: 'v8',
       include: ['src/**/*.{vue,js,ts}'],
       all: true,
       reporter: ['html', 'clover', 'text']
@@ -240,10 +472,10 @@ Add --coverage to the following item in package.json.
 ```
 
 Add index.vue to pages directory.
-```ts
+```vue
 // index.vue
 <template>
-  <h1 data-testid="page-title">
+  <h1>
     Pages/index.vue
   </h1>
 </template>
@@ -252,19 +484,17 @@ Add index.vue to pages directory.
 Here is a test code of index.vue.
 ```ts
 import { describe, expect, test } from 'vitest'
-import { render } from '@testing-library/vue'
-import Index from '~/pages/index.vue'
+import { render, screen } from '@testing-library/vue'
+import Index from './pages/index.vue'
 
 describe('Index', () => {
   test('Index page should render page title', () => {
     // Arrange
-    const { container } = render(Index)
-
-    // You need to call trim() because textContent return text with spaces added back and forth.
-    const title = container.querySelector('[data-testid="page-title"]')?.textContent?.trim()
+    render(Index)
+    const title = screen.getByText('Pages/index.vue')
 
     // Assert
-    expect(title).toBe('Pages/index.vue')
+    expect(title).toBeDefined()
   })
 })
 ```
@@ -297,25 +527,25 @@ npm run test:win
 # install VeeValidate
 npm install --save-dev vee-validate @vee-validate/i18n @vee-validate/rules
 ```
-Create vee-validate-plugin.ts in root directory and add the following to vee-validate-plugin.ts.
+Create vee-validate-plugin.ts in plugins directory and add the following to vee-validate-plugin.ts.
 ```ts
 // vee-validate-plugin.ts
 import { localize } from '@vee-validate/i18n'
 import en from '@vee-validate/i18n/dist/locale/en.json'
-import AllRules from '@vee-validate/rules'
+import { all } from '@vee-validate/rules'
 import { defineRule, configure } from 'vee-validate'
 import { defineNuxtPlugin } from '#app'
 
 export default defineNuxtPlugin((_nuxtApp) => {
   configure({
     generateMessage: localize({
-      en
-    })
+      en,
+    }),
   })
 
-  Object.keys(AllRules).forEach((rule) => {
-    // import all rules
-    defineRule(rule, AllRules[rule])
+  // import vee-validate all rules
+  Object.entries(all).forEach(([name, rule]) => {
+    defineRule(name, rule)
   })
 })
 ```
@@ -420,7 +650,7 @@ Create setup.ts in src/tests/unitTest and add the following to setup.ts.
 // setup.ts
 import { localize } from '@vee-validate/i18n'
 import en from '@vee-validate/i18n/dist/locale/en.json'
-import AllRules from '@vee-validate/rules'
+import { all } from '@vee-validate/rules'
 import { defineRule, configure } from 'vee-validate'
 import { vi } from 'vitest'
 import flushPromises from 'flush-promises'
@@ -428,15 +658,14 @@ import flushPromises from 'flush-promises'
 // vee-validate setup
 configure({
   generateMessage: localize({
-    en
-  })
+    en,
+  }),
 })
 
-Object.keys(AllRules).forEach((rule) => {
-  // import all rules
-  defineRule(rule, AllRules[rule])
+// import vee-validate all rules
+Object.entries(all).forEach(([name, rule]) => {
+  defineRule(name, rule)
 })
-
 
 // Call this method after you called fireEvent.
 // After call this method, your fireEvent operation will apply to HTML.
@@ -475,17 +704,17 @@ const foo = (values: Record<string, any>) => {
 
 ```ts
 // form.spec.ts
-import { describe, expect, test, vi } from 'vitest'
-import { fireEvent, render } from '@testing-library/vue'
-import { waitPerfectly } from '../setup'
-import Form from '~/pages/form.vue'
+import { expect, test, vi } from 'vitest'
+import { fireEvent, render, screen } from '@testing-library/vue'
+import { waitPerfectly } from '/setup'
+import Form from './pages/index.vue'
 
 vi.useFakeTimers()
 
 test('the email field should be a valid email', async () => {
   // Arrange
-  const { container } = render(Form)
-  const inputElement = container.querySelector('[data-testid="input-email"]') as HTMLInputElement
+  render(Form)
+  const inputElement = screen.getByTestId('input-email') as HTMLInputElement
 
   // Act
   // Input a invalid value
@@ -494,7 +723,7 @@ test('the email field should be a valid email', async () => {
   // Apply html
   await waitPerfectly()
   // Get error message
-  const errorMsg = container.querySelector('[data-testid="email-error-msg"]')?.textContent
+  const errorMsg = screen.getByTestId('email-error-msg')?.textContent
 
   // Assert
   expect(errorMsg).toBe('The email field must be a valid email')
@@ -555,7 +784,7 @@ npm ERR! Invalid comparator: latest
 ```json
 {
   "overrides": {
-    "vue": "3.2.45"
+    "vue": "3.4.30"
   }
 }
 ```
@@ -630,23 +859,71 @@ When run test file using pinia, the following error occurs.
 ```bash
 getActivePinia was called with no active Pinia. Did you forget to install pinia?
 ```
-To avoid this error, add the following to beforeEach.
+To avoid this error, call setActivePinia function in beforeEach.
 ```ts
+import { beforeEach, describe, expect, test } from 'vitest'
 import { setActivePinia, createPinia } from 'pinia'
+import { useUserStore } from '../../../store/user'
 
-beforeEach(() => {
-  setActivePinia(createPinia())
+const initialUser = {
+  email: '',
+  password: '',
+}
+const updatedUser = {
+  email: 'new email',
+  password: 'new password',
+}
+
+describe('Store', () => {
+  beforeEach(() => {
+    setActivePinia(createPinia())
+  })
+
+  test('store user info should be initial state', () => {
+    // Arrange
+    const store = useUserStore()
+
+    // Assert
+    expect(store.user).toEqual(initialUser)
+  })
+
+  test('if you call setUserInfo(), store user info should update', () => {
+    // Arrange
+    const store = useUserStore()
+
+    // Act
+    store.setUserInfo(updatedUser.email, updatedUser.password)
+
+    // Assert
+    expect(store.user).toEqual(updatedUser)
+  })
 })
 ```
 
 You can set the initial state of all of your stores when creating a testing pinia by passing an initialState.
 See [this](https://pinia.vuejs.org/cookbook/testing.html#initial-state) for more details.
+```vue
+<script lang="ts" setup>
+import { useUserStore } from '../store/user'
+
+const store = useUserStore()
+const email = store.user.email
+const password = store.user.password
+</script>
+
+<template>
+  <div>
+    <p>Email: {{ email }}</p>
+    <p>Password: {{ password }}</p>
+  </div>
+</template>
+```
 ```ts
-import { beforeEach, test } from 'vitest'
-import { render } from '@testing-library/vue'
+import { beforeEach, expect, test } from 'vitest'
+import { render, screen } from '@testing-library/vue'
 import { setActivePinia, createPinia } from 'pinia'
 import { createTestingPinia } from '@pinia/testing'
-import Foo from '~/pages/foo.vue'
+import Foo from './pages/index.vue'
 
 beforeEach(() => {
   setActivePinia(createPinia())
@@ -654,17 +931,21 @@ beforeEach(() => {
 
 test('store user info should set the initial value', () => {
   // Arrange
-  const { container } = render(Foo, {
+  render(Foo, {
     global: {
       plugins: [
         createTestingPinia({
           initialState: {
-            user: { user: { email: 'Initial email', password: 'Initial password' } }
-          }
-        })
-      ]
-    }
+            user: { user: { email: 'test@test.com', password: 'test' } },
+          },
+        }),
+      ],
+    },
   })
+
+  // Assert
+  expect(screen.getByText('Email: test@test.com')).toBeDefined()
+  expect(screen.getByText('Password: test')).toBeDefined()
 })
 ```
 ## [Data Fetching](https://nuxt.com/docs/getting-started/data-fetching)
@@ -686,6 +967,34 @@ Most things that you can do manually in the browser can be done using Puppeteer 
 ```bash
 # install Puppeteer
 npm install --save-dev puppeteer
+```
+```vue
+<script lang="ts" setup>
+import { Form, Field } from 'vee-validate'
+</script>
+
+<template>
+  <Form v-slot="{ meta, isSubmitting }">
+    <Field
+      rules="required|email"
+      name="email"
+      as="input"
+      type="text"
+    />
+    <Field
+      rules="required"
+      name="password"
+      as="input"
+      type="text"
+    />
+    <button
+      :disabled="isSubmitting || !meta.valid"
+      data-testid="submit-btn"
+    >
+      Submit
+    </button>
+  </Form>
+</template>
 ```
 Here is a sample E2E testing code.
 It tests submit button state.
@@ -745,7 +1054,7 @@ describe('E2E', () => {
         })
 
         // Assert
-        expect(isDisabled).toBeFalsy()
+        expect(isDisabled).toBe(false)
       } catch (e) {
         console.error(e)
         expect(e).toBeUndefined()
@@ -765,11 +1074,8 @@ To run E2E testing, add the test file path to config:path in package.json.
 # run application server
 npm run dev
 
-# run E2E testing (Linux/Mac)
-npm run test:linux
-
-# run E2E testing (Windows)
-npm run test:win
+# run E2E testing
+npm run test:e2e
 ```
 
 ## Analyzing source code by [SonarQube](https://docs.sonarqube.org/latest/)
