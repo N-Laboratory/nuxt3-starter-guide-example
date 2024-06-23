@@ -159,7 +159,7 @@ describe('Index', () => {
         )
 
         // Assert
-        expect(isDisabled).toBeFalsy()
+        expect(isDisabled).toBe(false)
         expect(pageTitle).toBe('MyPage')
         expect(email).toBe('test@test.com')
         expect(password).toBe('test')

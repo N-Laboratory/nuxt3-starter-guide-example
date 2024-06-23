@@ -108,7 +108,7 @@ describe('Form', () => {
       await waitPerfectly()
 
       // Assert
-      expect(submitElement.disabled).toBeFalsy()
+      expect(submitElement.disabled).toBe(false)
     })
 
     test('if click submit button, submission function should run', async () => {
