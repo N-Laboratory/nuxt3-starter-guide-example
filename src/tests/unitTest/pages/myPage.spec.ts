@@ -1,5 +1,5 @@
-import { beforeEach, describe, expect, test} from 'vitest'
-import { render } from '@testing-library/vue'
+import { beforeEach, describe, expect, test } from 'vitest'
+import { render, screen } from '@testing-library/vue'
 import { setActivePinia, createPinia } from 'pinia'
 import { createTestingPinia } from '@pinia/testing'
 import MyPage from '~/pages/myPage.vue'
@@ -14,10 +14,10 @@ describe('Mypage', () => {
 
   test('page should render', () => {
     // Arrange
-    const { container } = render(MyPage)
+    render(MyPage)
 
     // You need to call trim() because textContent return text with spaces added back and forth.
-    const title = container.querySelector('[data-testid="page-title"]')?.textContent?.trim()
+    const title = screen.getByTestId('page-title')?.textContent?.trim()
 
     // Assert
     expect(title).toBe('MyPage')
@@ -25,20 +25,20 @@ describe('Mypage', () => {
 
   test('email and password should be set from store user info.', () => {
     // Arrange
-    const { container } = render(MyPage, {
+    render(MyPage, {
       global: {
         plugins: [
           createTestingPinia({
             initialState: {
-              user: { user: { email: 'Initial email', password: 'Initial password' } }
-            }
-          })
-        ]
-      }
+              user: { user: { email: 'Initial email', password: 'Initial password' } },
+            },
+          }),
+        ],
+      },
     })
 
-    const email = container.querySelector('[data-testid="page-email"]')?.textContent
-    const password = container.querySelector('[data-testid="page-password"]')?.textContent
+    const email = screen.getByTestId('page-email')?.textContent
+    const password = screen.getByTestId('page-password')?.textContent
 
     // Assert
     expect(email).toBe('Initial email')

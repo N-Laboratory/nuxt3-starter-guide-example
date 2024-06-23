@@ -5,7 +5,7 @@ import { useUserStore } from '../store/user'
 const router = useRouter()
 const store = useUserStore()
 
-const submit = (values: Record<string, any>) => {
+const submit = (values: Record<string, string>) => {
   store.setUserInfo(values.email, values.password)
   router.push('/myPage')
 }
@@ -20,7 +20,11 @@ const submit = (values: Record<string, any>) => {
       <div class="login-form">
         <!-- By default the Form component use handleSubmit to handle any submit events -->
         <!-- show detail https://vee-validate.logaretm.com/v4/api/form/#slots -->
-        <Form v-slot="{ meta, isSubmitting }" data-testid="validation-form" @submit="submit">
+        <Form
+          v-slot="{ meta, isSubmitting }"
+          data-testid="validation-form"
+          @submit="submit"
+        >
           <div class="field">
             <Field
               rules="required|email"
@@ -31,7 +35,11 @@ const submit = (values: Record<string, any>) => {
               placeholder="email"
               data-testid="input-email"
             />
-            <ErrorMessage name="email" class="message invalid" data-testid="email-error-msg" />
+            <ErrorMessage
+              name="email"
+              class="message invalid"
+              data-testid="email-error-msg"
+            />
           </div>
           <div class="field">
             <Field
@@ -43,7 +51,11 @@ const submit = (values: Record<string, any>) => {
               placeholder="password"
               data-testid="input-password"
             />
-            <ErrorMessage name="password" class="message invalid" data-testid="password-error-msg" />
+            <ErrorMessage
+              name="password"
+              class="message invalid"
+              data-testid="password-error-msg"
+            />
           </div>
           <div class="field">
             <!-- If the form submission function is being run, isSubmitting return true. -->
@@ -51,7 +63,7 @@ const submit = (values: Record<string, any>) => {
             <!-- show detail https://vee-validate.logaretm.com/v4/api/use-form/#api-reference -->
             <button
               :disabled="isSubmitting || !meta.valid"
-              :class="{ 'btn-disabled' : isSubmitting || !meta.valid}"
+              :class="{ 'btn-disabled': isSubmitting || !meta.valid }"
               class="form-submit"
               data-testid="submit-btn"
             >

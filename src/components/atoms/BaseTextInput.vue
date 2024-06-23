@@ -10,17 +10,20 @@ const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
 const value = computed({
-  get (): string {
+  get(): string {
     return props.modelValue
   },
-  set (value: string) {
+  set(value: string) {
     emit('update:modelValue', value)
-  }
+  },
 })
 </script>
 
 <template>
-  <input v-model="value" type="text">
+  <input
+    v-model="value"
+    type="text"
+  >
 </template>
 
 <style scoped></style>

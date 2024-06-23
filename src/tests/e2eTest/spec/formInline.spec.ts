@@ -1,16 +1,16 @@
 import { afterAll, beforeAll, describe, expect, test } from 'vitest'
-import { launch, PuppeteerLaunchOptions } from 'puppeteer'
-import type { Browser, Page } from 'puppeteer'
+import { launch } from 'puppeteer'
+import type { Browser, Page, PuppeteerLaunchOptions } from 'puppeteer'
 
 const options: PuppeteerLaunchOptions = {
   headless: false,
   slowMo: 75,
   defaultViewport: {
     width: 1280,
-    height: 1024
+    height: 1024,
   },
   devtools: true,
-  args: ['--window-size=1680,1024']
+  args: ['--window-size=1680,1024'],
 }
 
 describe('Index', () => {
@@ -33,18 +33,19 @@ describe('Index', () => {
         await page.goto('http://localhost:3000/formInline')
         const isDisabled = await page.$eval(
           '[data-testid="submit-btn"]',
-          element => (element as HTMLButtonElement).disabled
+          element => (element as HTMLButtonElement).disabled,
         )
 
         // take a photo for evidence
         await page.screenshot({
           path: './src/tests/e2eTest/evidence/pages/formInline/test-01.png',
-          fullPage: true
+          fullPage: true,
         })
 
         // Assert
         expect(isDisabled).toBeTruthy()
-      } catch (e) {
+      }
+      catch (e) {
         console.error(e)
         expect(e).toBeUndefined()
       }
@@ -55,17 +56,17 @@ describe('Index', () => {
     test.each([
       [
         '2',
-        'email'
+        'email',
       ],
       [
         '3',
-        'password'
-      ]
+        'password',
+      ],
     ])(
       '%s:the %s field is required',
       async (
         testNo,
-        inputName
+        inputName,
       ) => {
         try {
           // Act
@@ -76,22 +77,23 @@ describe('Index', () => {
           // take a photo for evidence
           await page.screenshot({
             path: `./src/tests/e2eTest/evidence/pages/formInline/test-0${testNo}.png`,
-            fullPage: true
+            fullPage: true,
           })
 
           const errorMsg = await page.$eval(
             `[data-testid="${inputName}-error-msg"]`,
-            element => element.textContent
+            element => element.textContent,
           )
 
           // Assert
           expect(errorMsg).toBe(`The ${inputName} field is required`)
-        } catch (e) {
+        }
+        catch (e) {
           console.error(e)
           expect(e).toBeUndefined()
         }
       },
-      60000
+      60000,
     )
 
     test('4-the email field should be a valid email', async () => {
@@ -104,17 +106,18 @@ describe('Index', () => {
         // take a photo for evidence
         await page.screenshot({
           path: './src/tests/e2eTest/evidence/pages/formInline/test-04.png',
-          fullPage: true
+          fullPage: true,
         })
 
         const errorMsg = await page.$eval(
           '[data-testid="email-error-msg"]',
-          element => element.textContent
+          element => element.textContent,
         )
 
         // Assert
         expect(errorMsg).toBe('The email field must be a valid email')
-      } catch (e) {
+      }
+      catch (e) {
         console.error(e)
         expect(e).toBeUndefined()
       }
@@ -129,7 +132,7 @@ describe('Index', () => {
         await page.keyboard.press('Tab')
         const isDisabled = await page.$eval(
           '[data-testid="submit-btn"]',
-          element => (element as HTMLButtonElement).disabled
+          element => (element as HTMLButtonElement).disabled,
         )
 
         // Act
@@ -138,29 +141,30 @@ describe('Index', () => {
         // take a photo for evidence
         await page.screenshot({
           path: './src/tests/e2eTest/evidence/pages/formInline/test-05.png',
-          fullPage: true
+          fullPage: true,
         })
 
         // you need to call trim() because textContent return text with spaces added back and forth.
         const pageTitle = await page.$eval(
           '[data-testid="page-title"]',
-          element => element.textContent?.trim()
+          element => element.textContent?.trim(),
         )
         const email = await page.$eval(
           '[data-testid="page-email"]',
-          element => element.textContent
+          element => element.textContent,
         )
         const password = await page.$eval(
           '[data-testid="page-password"]',
-          element => element.textContent
+          element => element.textContent,
         )
 
         // Assert
-        expect(isDisabled).toBeFalsy()
+        expect(isDisabled).toBe(false)
         expect(pageTitle).toBe('MyPage')
         expect(email).toBe('test@test.com')
         expect(password).toBe('test')
-      } catch (e) {
+      }
+      catch (e) {
         console.error(e)
         expect(e).toBeUndefined()
       }
