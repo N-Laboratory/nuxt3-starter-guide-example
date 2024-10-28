@@ -15,20 +15,34 @@
     "test:e2e": "vitest ./src/tests/e2eTest/",
     "test:linux": "vitest --coverage $npm_package_config_path",
     "test:win": "vitest --coverage %npm_package_config_path%",
-    "sonar": "sonar-scanner"
+    "sonar": "sonar-scanner",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "devDependencies": {
+    "@chromatic-com/storybook": "^1.9.0",
     "@nuxt/eslint": "^0.3.13",
+    "@nuxtjs/storybook": "^8.3.2",
     "@pinia/testing": "^0.1.3",
+    "@storybook/addon-essentials": "^8.3.6",
+    "@storybook/addon-interactions": "^8.3.6",
+    "@storybook/addon-links": "^8.3.6",
+    "@storybook/addon-onboarding": "^8.3.6",
+    "@storybook/blocks": "^8.3.6",
+    "@storybook/test": "^8.3.6",
+    "@storybook/vue3": "^8.3.6",
+    "@storybook/vue3-vite": "^8.3.6",
     "@testing-library/vue": "^8.1.0",
     "@vee-validate/i18n": "^4.13.1",
     "@vee-validate/rules": "^4.13.1",
     "eslint": "^9.5.0",
+    "eslint-plugin-storybook": "^0.10.1",
     "flush-promises": "^1.0.2",
     "happy-dom": "^14.12.0",
     "nuxt": "^3.12.2",
     "puppeteer": "^22.11.0",
     "sonarqube-scanner": "^4.0.1",
+    "storybook": "^8.3.6",
     "typescript": "^5.4.5",
     "unplugin-auto-import": "^0.17.6",
     "vee-validate": "^4.13.1",
@@ -41,5 +55,10 @@
     "@pinia/nuxt": "^0.5.1",
     "@vitest/coverage-v8": "^1.6.0",
     "pinia": "^2.1.7"
+  },
+  "eslintConfig": {
+    "extends": [
+      "plugin:storybook/recommended"
+    ]
   }
 }

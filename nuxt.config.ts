@@ -17,8 +17,11 @@ export default defineNuxtConfig({
         // disableVuex: false ,
       },
     ],
-    '@nuxt/eslint',
-  ],
+    '@nuxt/eslint', '@nuxtjs/storybook'],
+  storybook: {
+    host: 'http://localhost',
+    port: 6006,
+  },
   eslint: {
     config: {
       stylistic: {

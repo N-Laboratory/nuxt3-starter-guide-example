@@ -5,6 +5,7 @@
   <img src="https://img.shields.io/badge/-Node.js-lightyellow.svg?logo=node.js&style=flat">
   <img src="https://img.shields.io/badge/-ESLint-4B32C3.svg?logo=eslint&style=flat">
   <img src="https://img.shields.io/badge/-Vitest-FF8800.svg?logo=vitest&style=flat">
+  <img src="https://img.shields.io/badge/-Storybook-grey.svg?logo=storybook&style=flat">
   <img src="https://img.shields.io/badge/-Puppeteer-lightyellow.svg?logo=puppeteer&style=flat">
   <img src="https://img.shields.io/badge/-SonarQube-white.svg?logo=sonarqube&style=flat">
   <img src="https://img.shields.io/badge/-Windows-0078D6.svg?logo=windows&style=flat">
@@ -35,6 +36,7 @@ This project implement the following.
 * VeeValidate
 * Navigation guard
 * Pinia
+* Storybook
 * Puppeteer (E2E test)
 * SonarQube
 * TypeScript
@@ -51,6 +53,7 @@ This project implement the following.
 1. [VeeValidate Testing](#veevalidate-testing)
 1. [Navigation guard](#navigation-guard)
 1. [Pinia Setup](#pinia-setup)
+1. [Storybook Setup](#storybook-setup)
 1. [Pinia Testing](#pinia-testing)
 1. [Data Fetching](#data-fetching)
 1. [E2E Testing By Puppeteer](#e2e-testing-by-puppeteer)
@@ -961,6 +964,63 @@ const { data: bar } = await useFetch('/api/v1/foo')
   Result: {{ bar }}
 </template>
 ```
+
+## [Storybook](https://storybook.js.org/docs) Setup
+Install Storybook
+```bash
+npx storybook@latest init --type vue3 --builder vite
+```
+
+Add the following to scripts in package.json
+```json
+"scripts": {
+  "storybook": "storybook dev -p 6006",
+},
+```
+Run the following command to start storybook, and then You can access http://localhost:6006/
+```bash
+npm run storybook
+```
+[NOTE](https://github.com/storybookjs/storybook/blob/next/MIGRATION.md#framework-specific-vite-plugins-have-to-be-explicitly-added): In Storybook 7, It would automatically add frameworks-specific Vite plugins, e.g. @vitejs/plugin-react if not installed. In Storybook 8 those plugins have to be added explicitly in the user's vite.config.ts:
+```ts
+// vite.config.ts
+import { defineConfig } from "vite";
+import vue from "@vitejs/plugin-vue";
+
+export default defineConfig({
+  plugins: [vue()],
+});
+```
+Without the above configure, the follwing error will occur.
+```bash
+ [vite] Internal server error: Failed to parse source for import analysis because the content contains invalid JS syntax. Install @vitejs/plugin-vue to handle .vue files.
+```
+
+Install [@nuxtjs/storybook](https://storybook.nuxtjs.org/getting-started/setup) dependency to your project.
+```bash
+npx nuxi@latest module add storybook
+```
+Add the following to modules in nuxt.config.ts.
+```ts
+// nuxt.config.ts
+export default defineNuxtConfig({
+  modules: ['@nuxtjs/storybook'],
+})
+```
+You can edit the storybook configuration with the storybook property in nuxt.config.ts.
+
+Add the following to modules in nuxt.config.ts. See [more options](https://storybook.nuxtjs.org/getting-started/options).
+```ts
+// nuxt.config.ts
+export default defineNuxtConfig({
+  storybook: {
+    host: 'http://localhost',
+    port: 6006,
+  },
+})
+```
+
+
 
 ## E2E Testing By [Puppeteer](https://github.com/puppeteer/puppeteer)
 Most things that you can do manually in the browser can be done using Puppeteer as E2E testing.
