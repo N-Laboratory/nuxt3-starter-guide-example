@@ -1020,6 +1020,39 @@ export default defineNuxtConfig({
 })
 ```
 
+### Import configuration
+If you use an alias in a vue file, an error will occur like below when storybook is running.
+```bash
+TypeError: Failed to fetch dynamically imported module:
+```
+```ts
+// foo.vue
+import Foo from '~/components/Foo.vue'
+```
+
+Add an alias to viteFinal in .storybook/main.ts to avoid above error.
+```ts
+import type { StorybookConfig } from "@storybook/vue3-vite";
+import path from "path";
+
+const config: StorybookConfig = {
+  // add this
+  viteFinal: async (config) => {
+    if (config?.resolve?.alias) {
+      config.resolve.alias = {
+        ...config.resolve.alias,
+        '@': path.resolve(__dirname, '../src'),
+        '~': path.resolve(__dirname, '../src'),
+      }
+    }
+    return config
+  },
+};
+```
+
+
+
+
 
 
 ## E2E Testing By [Puppeteer](https://github.com/puppeteer/puppeteer)
