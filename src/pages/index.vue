@@ -1,6 +1,4 @@
 <script lang="ts" setup>
-import BaseTextInput from '../components/atoms/BaseTextInput.vue'
-
 const text = ref('')
 </script>
 
