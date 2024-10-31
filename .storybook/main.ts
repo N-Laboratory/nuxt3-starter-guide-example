@@ -1,5 +1,7 @@
 import path from 'path'
 import type { StorybookConfig } from '@storybook/vue3-vite'
+import AutoImportFunctions from 'unplugin-auto-import/vite'
+import AutoImportComponents from 'unplugin-vue-components/vite'
 
 const config: StorybookConfig = {
   stories: ['../src/**/*.mdx', '../src/**/*.stories.@(js|jsx|mjs|ts|tsx)'],
@@ -20,6 +22,17 @@ const config: StorybookConfig = {
         '@': path.resolve(__dirname, '../src'),
         '~': path.resolve(__dirname, '../src'),
       }
+    }
+    if (config?.plugins) {
+      config.plugins.push(
+        AutoImportFunctions ({ imports: ['vue'], dts: '.storybook/auto-imports.d.ts' }),
+      )
+      config.plugins.push(
+        AutoImportComponents({
+          dirs: ['src/components'],
+          dts: '.storybook/components.d.ts',
+        }),
+      )
     }
     return config
   },

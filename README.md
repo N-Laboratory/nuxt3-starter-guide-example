@@ -977,7 +977,7 @@ Add the following to scripts in package.json
   "storybook": "storybook dev -p 6006",
 },
 ```
-Run the following command to start storybook, and then You can access http://localhost:6006/
+Run the following command to start storybook, and then you can access http://localhost:6006/
 ```bash
 npm run storybook
 ```
@@ -991,7 +991,7 @@ export default defineConfig({
   plugins: [vue()],
 });
 ```
-Without the above configure, the follwing error will occur.
+Without the above configurration, the follwing error will occur.
 ```bash
  [vite] Internal server error: Failed to parse source for import analysis because the content contains invalid JS syntax. Install @vitejs/plugin-vue to handle .vue files.
 ```
@@ -1009,7 +1009,7 @@ export default defineNuxtConfig({
 ```
 You can edit the storybook configuration with the storybook property in nuxt.config.ts.
 
-Add the following to modules in nuxt.config.ts. See [more options](https://storybook.nuxtjs.org/getting-started/options).
+Add the following to nuxt.config.ts. See [more options](https://storybook.nuxtjs.org/getting-started/options).
 ```ts
 // nuxt.config.ts
 export default defineNuxtConfig({
@@ -1050,9 +1050,57 @@ const config: StorybookConfig = {
 };
 ```
 
+### Nuxt auto import configuration
+Storybook cannot import functions that are automatically imports by nuxt (e.g. ref, computed, and so on.).
 
+Install the following library to import nuxt auto-imports functions in Storybook.
+- unplugin-auto-import
+```bash
+npm install --save-dev unplugin-auto-import
+```
+Add the following to viteFinal in .storybook/main.ts
+```ts
+import AutoImportFunctions from "unplugin-auto-import/vite";
 
+const config: StorybookConfig = {
+  viteFinal: async (config) => {
+    if (config?.plugins) {
+      // add this
+      config.plugins.push(
+        AutoImportFunctions ({ imports: ['vue'], dts: '.storybook/auto-imports.d.ts' }),
+      )
+    }
+    return config
+  },
+}
+```
 
+Storybook cannot import components that are automatically imports by nuxt.
+
+Install the following library to import nuxt auto-imports components in Storybook.
+- unplugin-vue-components
+```bash
+npm install --save-dev unplugin-vue-components
+```
+Add the following to viteFinal in .storybook/main.ts
+```ts
+import AutoImportComponents from 'unplugin-vue-components/vite'
+
+const config: StorybookConfig = {
+  viteFinal: async (config) => {
+    if (config?.plugins) {
+      // add this
+      config.plugins.push(
+        AutoImportComponents({
+          dirs: ['src/components'],
+          dts: '.storybook/components.d.ts',
+        }),
+      )
+    }
+    return config
+  },
+}
+```
 
 
 ## E2E Testing By [Puppeteer](https://github.com/puppeteer/puppeteer)
