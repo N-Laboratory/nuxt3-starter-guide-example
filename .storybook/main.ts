@@ -25,7 +25,7 @@ const config: StorybookConfig = {
     }
     if (config?.plugins) {
       config.plugins.push(
-        AutoImportFunctions ({ imports: ['vue'], dts: '.storybook/auto-imports.d.ts' }),
+        AutoImportFunctions ({ imports: ['vue', 'vee-validate', 'vue-router', 'pinia'], dts: '.storybook/auto-imports.d.ts' }),
       )
       config.plugins.push(
         AutoImportComponents({
