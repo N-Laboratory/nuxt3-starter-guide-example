@@ -977,10 +977,7 @@ Add the following to scripts in package.json
   "storybook": "storybook dev -p 6006",
 },
 ```
-Run the following command to start storybook, and then you can access http://localhost:6006/
-```bash
-npm run storybook
-```
+
 [NOTE](https://github.com/storybookjs/storybook/blob/next/MIGRATION.md#framework-specific-vite-plugins-have-to-be-explicitly-added): In Storybook 7, It would automatically add frameworks-specific Vite plugins, e.g. @vitejs/plugin-react if not installed. In Storybook 8 those plugins have to be added explicitly in the user's vite.config.ts:
 ```ts
 // vite.config.ts
@@ -995,11 +992,47 @@ Without the above configurration, the follwing error will occur.
 ```bash
  [vite] Internal server error: Failed to parse source for import analysis because the content contains invalid JS syntax. Install @vitejs/plugin-vue to handle .vue files.
 ```
+Create the new vue file and new story like this.
+```typescript
+// pages/index.vue
+<template>
+  <div>
+    Pages/index.vue
+  </div>
+</template>
+```
+```typescript
+// pages/index.stories.ts
+import type { Meta, StoryObj } from '@storybook/vue3'
+import Index from './index.vue'
 
+type Story = StoryObj<typeof Index>
+const meta: Meta<typeof Index> = {
+  title: 'Index',
+}
+
+export const Default: Story = {
+  render: () => ({
+    components: { Index },
+    template: '<Index />',
+  }),
+}
+
+export default meta
+```
+Run the following command to start storybook, and then you can access http://localhost:6006/
+```bash
+npm run storybook
+```
 Install [@nuxtjs/storybook](https://storybook.nuxtjs.org/getting-started/setup) dependency to your project.
 ```bash
 npx nuxi@latest module add storybook
 ```
+After installation this library, the following command will start nuxt and Storybook at the same time.
+```bash
+npm run dev
+```
+
 Add the following to modules in nuxt.config.ts.
 ```ts
 // nuxt.config.ts
@@ -1053,7 +1086,7 @@ const config: StorybookConfig = {
 ### Nuxt auto import configuration
 Storybook cannot import functions that are automatically imports by nuxt (e.g. ref, computed, and so on.).
 
-Install the following library to import nuxt auto-imports functions in Storybook.
+Install the following library to import nuxt auto-imports functions in storybook.
 - unplugin-auto-import
 ```bash
 npm install --save-dev unplugin-auto-import
@@ -1077,7 +1110,7 @@ const config: StorybookConfig = {
 
 Storybook cannot import components that are automatically imports by nuxt.
 
-Install the following library to import nuxt auto-imports components in Storybook.
+Install the following library to import nuxt auto-imports components in storybook.
 - unplugin-vue-components
 ```bash
 npm install --save-dev unplugin-vue-components
@@ -1122,7 +1155,7 @@ setup((app: App) => {
 })
 ```
 
-If you want to set initial state in store, add the follwing to each story in Storybook.
+If you want to set initial state in store, add the follwing to each story in storybook.
 ```ts
 import type { Meta, StoryObj } from '@storybook/vue3'
 import Index from './index.vue'
