@@ -1067,7 +1067,7 @@ const config: StorybookConfig = {
     if (config?.plugins) {
       // add this
       config.plugins.push(
-        AutoImportFunctions ({ imports: ['vue'], dts: '.storybook/auto-imports.d.ts' }),
+        AutoImportFunctions ({ imports: ['vue', 'vee-validate', 'vue-router', 'pinia'], dts: '.storybook/auto-imports.d.ts' }),
       )
     }
     return config
@@ -1102,6 +1102,79 @@ const config: StorybookConfig = {
 }
 ```
 
+### Using Pinia in Storybook
+Storybook cannot use pinia by default.
+The following error will occur when using pinia in vue file.
+```
+"getActivePinia()" was called but there was no active Pinia. Are you trying to use a store before calling "app.use(pinia)"?
+```
+To aboid this, add the follwing to .storybook/preview.ts.
+```ts
+// .storybook/preview.ts
+import { type Preview, setup } from '@storybook/vue3'
+import { type App } from 'vue'
+import { createPinia } from 'pinia'
+
+const pinia = createPinia()
+
+setup((app: App) => {
+  app.use(pinia)
+})
+```
+
+If you want to set initial state in store, add the follwing to each story in Storybook.
+```ts
+import type { Meta, StoryObj } from '@storybook/vue3'
+import Index from './index.vue'
+import { useUserStore } from '~/store/user'
+
+type Story = StoryObj<typeof Index>
+
+const meta: Meta<typeof Index> = {
+  title: 'Index',
+}
+
+export const Default: Story = {
+  render: () => ({
+    setup() {
+      // add this
+      const store = useUserStore()
+      store.user.email = 'foo@bar.com'
+      store.user.password = 'foobar'
+    },
+    components: { Index },
+    template: '<Index />',
+  }),
+}
+
+export default meta
+
+```
+
+
+### Using Vee-Validate in Storybook
+Storybook cannot use Vee-Validate by default.
+The following error will occur when using Vee-Validate in vue file.
+```
+Error: No such validator 'XXXX' exists.
+```
+To aboid this, add the follwing to .storybook/preview.ts.
+```ts
+// .storybook/preview.ts
+import { localize } from '@vee-validate/i18n'
+import en from '@vee-validate/i18n/dist/locale/en.json'
+import { all } from '@vee-validate/rules'
+import { defineRule, configure } from 'vee-validate'
+
+configure({
+  generateMessage: localize({ en }),
+})
+
+Object.entries(all).forEach(([name, rule]) => {
+  // import all validation-rules
+  defineRule(name, rule)
+})
+```
 
 ## E2E Testing By [Puppeteer](https://github.com/puppeteer/puppeteer)
 Most things that you can do manually in the browser can be done using Puppeteer as E2E testing.
