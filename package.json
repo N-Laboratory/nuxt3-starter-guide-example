@@ -48,14 +48,14 @@
     "unplugin-auto-import": "^0.17.8",
     "unplugin-vue-components": "^0.27.4",
     "vee-validate": "^4.13.1",
-    "vitest": "^1.6.0",
+    "vitest": "^2.1.4",
     "vitest-sonar-reporter": "^2.0.0",
     "vue": "^3.4.29",
     "vue-tsc": "^1.8.22"
   },
   "dependencies": {
     "@pinia/nuxt": "^0.5.1",
-    "@vitest/coverage-v8": "^1.6.0",
+    "@vitest/coverage-v8": "^2.1.4",
     "pinia": "^2.1.7"
   },
   "eslintConfig": {
