@@ -1209,6 +1209,104 @@ Object.entries(all).forEach(([name, rule]) => {
 })
 ```
 
+
+### Mocking API Request in Storybook
+Use msw to mock Rest and GraphQL requests right inside your story in storybook. With msw-storybook-addon, you can easily mock your APIs, making that process much simpler.
+```bash
+npm install --save-dev msw msw-storybook-addon
+npx msw init public/
+```
+Enable MSW in Storybook by initializing MSW and providing the MSW decorator in ./storybook/preview.js
+```ts
+// .storybook\preview.ts
+import { initialize, mswLoader } from 'msw-storybook-addon'
+
+// Initialize MSW
+initialize()
+
+const preview: Preview = {
+  // Provide the MSW addon loader globally
+  loaders: [mswLoader],
+}
+
+export default preview
+```
+Then ensure the staticDirs property in your Storybook configuration will include the generated service worker file (in /public, by default).
+```ts
+// .storybook\main.ts
+const config: StorybookConfig = {
+  staticDirs: ['../public'],
+}
+export default config
+```
+Here is an example uses the fetch API to make network requests.
+```ts
+// index.vue
+<script lang="ts" setup>
+import { useFetch } from '@vueuse/core'
+
+const uuid = ref('')
+const handleClick = async () => {
+  const { data } = await useFetch('https://httpbin.org/uuid').json()
+  uuid.value = data.value.uuid
+}
+</script>
+
+<template>
+  <div>
+    <input type="submit" value="Get uuid" @click="handleClick">
+    <p>UUID = {{ uuid }}</p>
+  </div>
+</template>
+```
+```ts
+// index.stories.ts
+import type { Meta, StoryObj } from '@storybook/vue3'
+import { http, HttpResponse } from 'msw'
+import Index from './index.vue'
+
+type Story = StoryObj<typeof Index>
+
+const meta: Meta<typeof Index> = {
+  title: 'Index',
+}
+
+export const Default: Story = {
+  render: () => ({
+    components: { Index },
+    template: '<Index />',
+  }),
+  parameters: {
+    msw: {
+      handlers: [
+        http.get('https://httpbin.org/uuid', () => {
+          return HttpResponse.json({
+            uuid: 'test uuid',
+          })
+        }),
+      ],
+    },
+  },
+}
+
+export default meta
+```
+msw-storybook-addon starts MSW with default configuration. If you want to configure it, you can pass options to the initialize function. They are the StartOptions from setupWorker.
+A common example is to configure the onUnhandledRequest behavior, as MSW logs a warning in case there are requests which were not handled.
+If you want MSW to bypass unhandled requests and not do anything:
+```ts
+// preview.ts
+import { initialize } from 'msw-storybook-addon';
+
+initialize({
+  onUnhandledRequest: 'bypass'
+})
+```
+
+
+
+
+
 ## E2E Testing By [Puppeteer](https://github.com/puppeteer/puppeteer)
 Most things that you can do manually in the browser can be done using Puppeteer as E2E testing.
 ```bash
