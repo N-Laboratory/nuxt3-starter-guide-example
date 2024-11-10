@@ -6,9 +6,12 @@ import en from '@vee-validate/i18n/dist/locale/en.json'
 // import ja from '@vee-validate/i18n/dist/locale/ja.json'
 import { all } from '@vee-validate/rules'
 import { defineRule, configure } from 'vee-validate'
+import { initialize, mswLoader } from 'msw-storybook-addon'
 
 const pinia = createPinia()
-
+initialize({
+  onUnhandledRequest: 'bypass',
+})
 setup((app: App) => {
   app.use(pinia)
 })
@@ -23,6 +26,7 @@ Object.entries(all).forEach(([name, rule]) => {
 })
 
 const preview: Preview = {
+  loaders: [mswLoader],
   parameters: {
     controls: {
       matchers: {

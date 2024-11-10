@@ -15,6 +15,7 @@ const config: StorybookConfig = {
     name: '@storybook/vue3-vite',
     options: {},
   },
+  staticDirs: ['../public'],
   viteFinal: async (config) => {
     if (config?.resolve?.alias) {
       config.resolve.alias = {
@@ -25,7 +26,12 @@ const config: StorybookConfig = {
     }
     if (config?.plugins) {
       config.plugins.push(
-        AutoImportFunctions ({ imports: ['vue', 'vee-validate', 'vue-router', 'pinia'], dts: '.storybook/auto-imports.d.ts' }),
+        AutoImportFunctions ({ imports: [
+          'vue',
+          'vee-validate',
+          'vue-router',
+          'pinia',
+        ], dts: '.storybook/auto-imports.d.ts' }),
       )
       config.plugins.push(
         AutoImportComponents({
