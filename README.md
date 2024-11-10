@@ -1593,30 +1593,32 @@ sonar.javascript.file.suffixes=.js,.jsx
 sonar.typescript.file.suffixes=.ts,.tsx,.vue
 sonar.typescript.lcov.reportPaths=coverage/lcov.info
 sonar.javascript.lcov.reportPaths=coverage/lcov.info
-sonar.login=sqp_XXXXXXXXXXXXXXXXXXXXXX
+sonar.token=sqp_XXXXXXXXXXXXXXXXXXXXXX
 ```
 
 ### Create a SonarQube project
-Make sure you have installed SonarQube on your development machine.
+Make sure you have installed SonarQube (v10.7) on your development machine.
 Run SonarQube server as localhost:9000 before do the following.
 
 To create a SonarQube project, do the following.
 1. Access the following url.
-http://localhost:9000/projects
+http://localhost:9000/projects/create
 
-1. Click [Create Project] and then click [Manually]
+1. Click [Create a local project]
 
-1. Input __nuxt3-starter-guide__ in Project display name and Project key. Click [Set Up]
+1. Input __nuxt3-starter-guide__ in Project display name and Project key. Click [Next]
+
+1. Select [Use the global setting] and click [Create project]
 
 1. Click [Locally]
 
 1. Click [Generate] and then generate project token
 
 ### Analyze your source code
-Add project token to sonar.login in sonar-project.properties.
+Add project token to sonar.token in sonar-project.properties.
 See [this](https://docs.sonarqube.org/latest/user-guide/user-account/generating-and-using-tokens/) for more details of token.
 ```properties
-sonar.login=sqp_XXXXXXXXXXXXXXXXXXXXXX
+sonar.token=sqp_XXXXXXXXXXXXXXXXXXXXXX
 ```
 
 Add the following to scripts in package.json.
