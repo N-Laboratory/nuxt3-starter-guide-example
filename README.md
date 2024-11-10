@@ -1209,7 +1209,6 @@ Object.entries(all).forEach(([name, rule]) => {
 })
 ```
 
-
 ### Mocking API Request in Storybook
 Use msw to mock Rest and GraphQL requests right inside your story in storybook. With msw-storybook-addon, you can easily mock your APIs, making that process much simpler.
 ```bash
@@ -1303,9 +1302,142 @@ initialize({
 })
 ```
 
+### Run tests inside Storybook
+Storybook's test addon allows you to test your components directly inside Storybook. It does this by using a Vitest plugin to transform your stories into Vitest tests using portable stories.
 
+Before installing, make sure your project meets the following requirements:
+- Storybook ≥ 8.4
+- A Storybook framework that uses Vite (e.g. vue3-vite), or the Storybook Next.js framework
+- Vitest ≥ 2.1
 
+Run the following command to install and configure the addon, which contains the plugin to run your stories as tests using Vitest:
+```bash
+npx storybook add @storybook/experimental-addon-test
+```
+That add command will install and register the test addon. It will also inspect your project's Vite and Vitest setup, and install and configure them with sensible defaults, if necessary.
+Make sure the following ts file have been created.
+```ts
+// vitest.workspace.ts
+import path from 'path'
+import { defineWorkspace } from 'vitest/config'
+import { storybookTest } from '@storybook/experimental-addon-test/vitest-plugin'
+import { storybookVuePlugin } from '@storybook/vue3-vite/vite-plugin'
+import AutoImport from 'unplugin-auto-import/vite'
+import AutoImportComponents from 'unplugin-vue-components/vite'
 
+export default defineWorkspace([
+  'vitest.config.ts',
+  {
+    extends: 'vite.config.ts',
+    plugins: [
+      storybookTest({ configDir: '.storybook' }),
+      storybookVuePlugin(),
+      // Import nuxt-auto-imports functions
+      AutoImport({
+        imports: ['vue', 'vue-router'],
+      }),
+      // Import nuxt-auto-imports components
+      AutoImportComponents({
+        dirs: ['src/components'],
+        dts: '.storybook/components.d.ts',
+      }),
+    ],
+    resolve: {
+      alias: {
+        '~': path.resolve(__dirname, './src'),
+        '@': path.resolve(__dirname, './src'),
+      },
+    },
+    test: {
+      name: 'storybook',
+      browser: {
+        enabled: true,
+        headless: true,
+        name: 'chromium',
+        provider: 'playwright',
+      },
+      include: ['**/*.stories.?(m)[jt]s?(x)'],
+      setupFiles: ['.storybook/vitest.setup.ts'],
+    },
+  },
+])
+```
+Add the follwing to scripts in package.json.
+--project=storybook will run tests only stories.ts.
+```json
+  "scripts": {
+    "test:storybook": "vitest --project=storybook",
+  },
+```
+
+Here is an example.
+```ts
+// index.vue
+<script lang="ts" setup>
+import { useFetch } from '@vueuse/core'
+
+const uuid = ref('')
+const handleClick = async () => {
+  const { data } = await useFetch('https://httpbin.org/uuid').json()
+  uuid.value = data.value.uuid
+}
+</script>
+
+<template>
+  <div>
+    <input type="submit" value="Get uuid" @click="handleClick">
+    <p>UUID = {{ uuid }}</p>
+  </div>
+</template>
+```
+```ts
+// index.stories.ts
+import type { Meta, StoryObj } from '@storybook/vue3'
+import { http, HttpResponse } from 'msw'
+import { within, userEvent } from '@storybook/test'
+import Index from './index.vue'
+
+type Story = StoryObj<typeof Index>
+
+const meta: Meta<typeof Index> = {
+  title: 'Index',
+}
+
+export const GetUuid: Story = {
+  render: () => ({
+    components: { Index },
+    template: '<Index />',
+  }),
+  parameters: {
+    msw: {
+      handlers: [
+        http.get('https://httpbin.org/uuid', () => {
+          return HttpResponse.json({
+            uuid: 'test uuid',
+          })
+        }),
+      ],
+    },
+  },
+  play: async ({ canvasElement }) => {
+    // Arrange
+    const canvas = within(canvasElement)
+    const button = await canvas.findByText('Get uuid')
+
+    // Act
+    await userEvent.click(button)
+
+    // Assert
+    await canvas.findByText('UUID = test uuid')
+  },
+}
+
+export default meta
+```
+Run the following command to run tests.
+```bash
+npm run test:storybook
+```
 
 ## E2E Testing By [Puppeteer](https://github.com/puppeteer/puppeteer)
 Most things that you can do manually in the browser can be done using Puppeteer as E2E testing.
