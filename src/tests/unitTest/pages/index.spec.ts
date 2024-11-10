@@ -1,8 +1,22 @@
-import { describe, expect, test } from 'vitest'
+import { vi, describe, expect, test, afterEach } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/vue'
+import { useFetch } from '@vueuse/core'
+import { waitPerfectly } from '../setup'
 import Index from '~/pages/index.vue'
 
+vi.useFakeTimers()
+
+vi.mock('@vueuse/core', () => {
+  return {
+    useFetch: vi.fn(),
+  }
+})
+
 describe('Index', () => {
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
   test('Index page should render page title', () => {
     // Arrange
     render(Index)
@@ -24,5 +38,25 @@ describe('Index', () => {
 
     // Assert
     expect(input.value).toBe('Test')
+  })
+
+  test('UUID should get', async () => {
+    // Arrange
+    vi.mocked(useFetch).mockImplementation(
+      vi.fn().mockReturnValue({
+        json: vi.fn().mockReturnValue({
+          data: ref({ uuid: 'Test uuid' }),
+        }),
+      }),
+    )
+    render(Index)
+    const uuidBtn = screen.getByText('Get uuid')
+
+    // Act
+    await fireEvent.click(uuidBtn)
+    await waitPerfectly()
+
+    // Assert
+    expect(screen.getByText('UUID = Test uuid')).toBeDefined()
   })
 })
