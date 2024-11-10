@@ -1,17 +1,5 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  srcDir: 'src/',
-
-  components: [
-    { path: '~/components/', pathPrefix: false },
-  ],
-
-  typescript: {
-    shim: false,
-    strict: true,
-    typeCheck: true,
-  },
-
   modules: [
     ['@pinia/nuxt',
       {
@@ -24,12 +12,16 @@ export default defineNuxtConfig({
       },
     ],
     '@nuxt/eslint', '@nuxtjs/storybook'],
-
-  storybook: {
-    host: 'http://localhost',
-    port: 6006,
+  components: [
+    { path: '~/components/', pathPrefix: false },
+  ],
+  srcDir: 'src/',
+  compatibilityDate: '2024-11-10',
+  typescript: {
+    shim: false,
+    strict: true,
+    typeCheck: true,
   },
-
   eslint: {
     config: {
       stylistic: {
@@ -39,6 +31,8 @@ export default defineNuxtConfig({
       },
     },
   },
-
-  compatibilityDate: '2024-11-10',
+  storybook: {
+    host: 'http://localhost',
+    port: 6006,
+  },
 })

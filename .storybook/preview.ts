@@ -1,5 +1,5 @@
 import { type Preview, setup } from '@storybook/vue3'
-import { type App } from 'vue'
+import type { App } from 'vue'
 import { createPinia } from 'pinia'
 import { localize } from '@vee-validate/i18n'
 import en from '@vee-validate/i18n/dist/locale/en.json'
