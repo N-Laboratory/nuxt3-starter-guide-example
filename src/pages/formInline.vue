@@ -14,7 +14,7 @@ const submit = (values: Record<string, string>) => {
 <template>
   <div class="login-page">
     <div class="form">
-      <h1 data-testid="page-title">
+      <h1>
         Login
       </h1>
       <div class="login-form">
@@ -22,7 +22,6 @@ const submit = (values: Record<string, string>) => {
         <!-- show detail https://vee-validate.logaretm.com/v4/api/form/#slots -->
         <Form
           v-slot="{ meta, isSubmitting }"
-          data-testid="validation-form"
           @submit="submit"
         >
           <div class="field">
@@ -33,12 +32,10 @@ const submit = (values: Record<string, string>) => {
               type="text"
               class="form-text"
               placeholder="email"
-              data-testid="input-email"
             />
             <ErrorMessage
               name="email"
               class="message invalid"
-              data-testid="email-error-msg"
             />
           </div>
           <div class="field">
@@ -49,12 +46,10 @@ const submit = (values: Record<string, string>) => {
               type="text"
               class="form-text"
               placeholder="password"
-              data-testid="input-password"
             />
             <ErrorMessage
               name="password"
               class="message invalid"
-              data-testid="password-error-msg"
             />
           </div>
           <div class="field">
@@ -65,7 +60,6 @@ const submit = (values: Record<string, string>) => {
               :disabled="isSubmitting || !meta.valid"
               :class="{ 'btn-disabled': isSubmitting || !meta.valid }"
               class="form-submit"
-              data-testid="submit-btn"
             >
               Submit
             </button>
