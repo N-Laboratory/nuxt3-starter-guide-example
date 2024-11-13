@@ -2,7 +2,7 @@ import path from 'path'
 import { defineWorkspace } from 'vitest/config'
 import { storybookTest } from '@storybook/experimental-addon-test/vitest-plugin'
 import { storybookVuePlugin } from '@storybook/vue3-vite/vite-plugin'
-import AutoImport from 'unplugin-auto-import/vite'
+import AutoImportFunctions from 'unplugin-auto-import/vite'
 import AutoImportComponents from 'unplugin-vue-components/vite'
 
 // More info at: https://storybook.js.org/docs/writing-tests/vitest-plugin
@@ -14,8 +14,12 @@ export default defineWorkspace([
       // See options at: https://storybook.js.org/docs/writing-tests/vitest-plugin#storybooktest
       storybookTest({ configDir: '.storybook' }),
       storybookVuePlugin(),
-      AutoImport({
-        imports: ['vue', 'vue-router'],
+      AutoImportFunctions ({ imports: [
+        'vue',
+        'vee-validate',
+        'vue-router',
+        'pinia',
+      ], dts: '.storybook/auto-imports.d.ts',
       }),
       AutoImportComponents({
         dirs: ['src/components'],
