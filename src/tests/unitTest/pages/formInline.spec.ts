@@ -57,10 +57,9 @@ describe('Form', () => {
 
         // Act
         await user.type(inputElement, '{Tab}')
-        const errorMsg = screen.getByText(`The ${inputName} field is required`)
 
         // Assert
-        expect(errorMsg).toBeTruthy()
+        expect(screen.getByText(`The ${inputName} field is required`)).toBeTruthy()
       })
 
     test('the email field should be a valid email', async () => {
@@ -87,11 +86,8 @@ describe('Form', () => {
       render(Form)
 
       // Act
-      const email = screen.getByPlaceholderText('email')
-      await user.type(email, 'abc@abc.com')
-
-      const password = screen.getByPlaceholderText('password')
-      await user.type(password, '123')
+      await user.type(screen.getByPlaceholderText('email'), 'abc@abc.com')
+      await user.type(screen.getByPlaceholderText('password'), '123')
 
       await waitFor(() => {
         // Assert
@@ -105,11 +101,8 @@ describe('Form', () => {
       const user = userEvent.setup()
       render(Form)
 
-      const email = screen.getByPlaceholderText('email')
-      await user.type(email, 'abc@abc.com')
-
-      const password = screen.getByPlaceholderText('password')
-      await user.type(password, '123')
+      await user.type(screen.getByPlaceholderText('email'), 'abc@abc.com')
+      await user.type(screen.getByPlaceholderText('password'), '123')
 
       // Act
       await user.click(screen.getByRole('button'))

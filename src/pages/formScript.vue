@@ -24,7 +24,7 @@ const submit = handleSubmit(() => {
 <template>
   <div class="login-page">
     <div class="form">
-      <h1 data-testid="page-title">
+      <h1>
         Login
       </h1>
       <div class="login-form">
@@ -35,12 +35,10 @@ const submit = handleSubmit(() => {
             type="text"
             name="email"
             placeholder="email"
-            data-testid="input-email"
           >
           <span
             v-if="errors.email"
             class="message invalid"
-            data-testid="email-error-msg"
           >{{ errors.email }}</span>
         </div>
         <div class="field">
@@ -50,12 +48,10 @@ const submit = handleSubmit(() => {
             type="text"
             name="password"
             placeholder="password"
-            data-testid="input-password"
           >
           <span
             v-if="errors.password"
             class="message invalid"
-            data-testid="password-error-msg"
           >{{ errors.password }}</span>
         </div>
         <div class="field">
@@ -66,7 +62,6 @@ const submit = handleSubmit(() => {
             :disabled="isSubmitting || !meta.valid"
             :class="{ 'btn-disabled': isSubmitting || !meta.valid }"
             class="form-submit"
-            data-testid="submit-btn"
             @click="submit"
           >
             Submit

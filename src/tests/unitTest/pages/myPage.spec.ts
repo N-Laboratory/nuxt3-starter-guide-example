@@ -15,9 +15,7 @@ describe('Mypage', () => {
   test('page should render', () => {
     // Arrange
     render(MyPage)
-
-    // You need to call trim() because textContent return text with spaces added back and forth.
-    const title = screen.getByTestId('page-title')?.textContent?.trim()
+    const title = screen.getByRole('heading', { level: 1 })?.textContent?.trim()
 
     // Assert
     expect(title).toBe('MyPage')
@@ -37,11 +35,11 @@ describe('Mypage', () => {
       },
     })
 
-    const email = screen.getByTestId('page-email')?.textContent
-    const password = screen.getByTestId('page-password')?.textContent
+    const email = screen.getByText('Email:', { exact: false }).textContent?.trim()
+    const password = screen.getByText('Password:', { exact: false }).textContent?.trim()
 
     // Assert
-    expect(email).toBe('Initial email')
-    expect(password).toBe('Initial password')
+    expect(email).toBe('Email: Initial email')
+    expect(password).toBe('Password: Initial password')
   })
 })

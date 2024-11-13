@@ -23,6 +23,7 @@ const value = computed({
   <input
     v-model="value"
     type="text"
+    placeholder="text"
   >
 </template>
 

@@ -26,9 +26,7 @@ describe('Form', () => {
     test('page should render', () => {
       // Arrange
       render(Form)
-
-      // You need to call trim() because textContent return text with spaces added back and forth.
-      const title = screen.getByTestId('page-title')?.textContent?.trim()
+      const title = screen.getByRole('heading', { level: 1 })?.textContent?.trim()
 
       // Assert
       expect(title).toBe('Login')
@@ -37,13 +35,11 @@ describe('Form', () => {
     test('submit button should be disabled', async () => {
       // Arrange
       render(Form)
-
-      // You have to call flushPromises after render() called because HTMLButtonElement.disabled always return false in the initial state.
       await waitPerfectly()
-      const isDisabled = (screen.getByTestId('submit-btn') as HTMLButtonElement).disabled
 
       // Assert
-      expect(isDisabled).toBeTruthy()
+      const isDisabled = (screen.getByRole('button') as HTMLButtonElement).disabled
+      expect(isDisabled).toBe(true)
     })
   })
 
@@ -58,57 +54,52 @@ describe('Form', () => {
       ) => {
         // Arrange
         render(Form)
-        const inputElement = screen.getByTestId(`input-${inputName}`) as HTMLInputElement
+        const inputElement = screen.getByPlaceholderText(inputName)
 
         // Act
         await fireEvent.update(inputElement, '')
         await waitPerfectly()
-        const errorMsg = screen.getByTestId(`${inputName}-error-msg`)?.textContent
 
         // Assert
-        expect(errorMsg).toBe(`The ${inputName} field is required`)
+        expect(screen.getByText(`The ${inputName} field is required`)).toBeTruthy()
       })
 
     test('the email field should be a valid email', async () => {
       // Arrange
       render(Form)
-      const inputElement = screen.getByTestId('input-email') as HTMLInputElement
+      const email = screen.getByPlaceholderText('email')
 
       // Act
-      await fireEvent.update(inputElement, 'abc')
+      await fireEvent.update(email, 'abc')
       await waitPerfectly()
-      const errorMsgInputInvalidValue = screen.getByTestId('email-error-msg')?.textContent
+      const errorMsgWithInvalidValue = screen.getByText('The email field must be a valid email')
 
-      await fireEvent.update(inputElement, 'abc@abc.com')
+      await fireEvent.update(email, 'abc@abc.com')
       await waitPerfectly()
-      const errorMsgInputValidValue = screen.queryByTestId('email-error-msg')?.textContent
+      const errorMsgWithValidValue = screen.queryByText('The email field must be a valid email')
 
       // Assert
-      expect(errorMsgInputInvalidValue).toBe('The email field must be a valid email')
-      expect(errorMsgInputValidValue).toBeFalsy()
+      expect(errorMsgWithInvalidValue).toBeTruthy()
+      expect(errorMsgWithValidValue).toBeNull()
     })
 
     test('if all field is valid、submit button should be enabled', async () => {
       // Arrange
       render(Form)
-      // You have to call flushPromises after render() called because HTMLButtonElement.disabled always return false in the initial state.
-      await waitPerfectly()
 
       // Act
-      const emailInputElement = screen.getByTestId('input-email') as HTMLInputElement
-      await fireEvent.update(emailInputElement, 'abc@abc.com')
+      await fireEvent.update(screen.getByPlaceholderText('email'), 'abc@abc.com')
       await waitPerfectly()
 
-      const passwordInputElement = screen.getByTestId('input-password') as HTMLInputElement
-      await fireEvent.update(passwordInputElement, '123')
+      await fireEvent.update(screen.getByPlaceholderText('password'), '123')
       await waitPerfectly()
 
-      const submitElement = screen.getByTestId('submit-btn') as HTMLButtonElement
-      await fireEvent.click(submitElement)
+      const submit = screen.getByRole('button') as HTMLButtonElement
+      await fireEvent.click(submit)
       await waitPerfectly()
 
       // Assert
-      expect(submitElement.disabled).toBe(false)
+      expect(submit.disabled).toBe(false)
     })
 
     test('if click submit button, submission function should run', async () => {
@@ -117,16 +108,11 @@ describe('Form', () => {
       // Arrange
       render(Form, { global: { mocks: { submit: submitFn } } })
 
-      const emailInputElement = screen.getByTestId('input-email') as HTMLInputElement
-      await fireEvent.update(emailInputElement, 'abc@abc.com')
-      await waitPerfectly()
-
-      const passwordInputElement = screen.getByTestId('input-password') as HTMLInputElement
-      await fireEvent.update(passwordInputElement, '123')
-      await waitPerfectly()
+      await fireEvent.update(screen.getByPlaceholderText('email'), 'abc@abc.com')
+      await fireEvent.update(screen.getByPlaceholderText('password'), '123')
 
       // Act
-      await fireEvent.click((screen.getByTestId('submit-btn') as HTMLButtonElement))
+      await fireEvent.click(screen.getByRole('button'))
       await waitPerfectly()
 
       // Assert

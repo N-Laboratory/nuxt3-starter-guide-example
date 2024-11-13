@@ -11,19 +11,18 @@ const handleClick = async () => {
 
 <template>
   <div>
-    <h1 data-testid="page-title">
+    <h1>
       Pages/index.vue
     </h1>
     <BaseTextInput
       v-model="text"
-      data-testid="text-input"
     />
     <p>Input value = {{ text }}</p>
-    <input
-      type="submit"
-      value="Get uuid"
+    <button
       @click="handleClick"
     >
+      Get uuid
+    </button>
     <p>UUID = {{ uuid }}</p>
   </div>
 </template>

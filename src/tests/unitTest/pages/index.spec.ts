@@ -1,7 +1,7 @@
 import { vi, describe, expect, test, afterEach } from 'vitest'
-import { fireEvent, render, screen } from '@testing-library/vue'
+import { render, screen } from '@testing-library/vue'
 import { useFetch } from '@vueuse/core'
-import { waitPerfectly } from '../setup'
+import userEvent from '@testing-library/user-event'
 import Index from '~/pages/index.vue'
 
 vi.useFakeTimers()
@@ -20,9 +20,7 @@ describe('Index', () => {
   test('Index page should render page title', () => {
     // Arrange
     render(Index)
-
-    // You need to call trim() because textContent return text with spaces added back and forth.
-    const title = screen.getByTestId('page-title')?.textContent?.trim()
+    const title = screen.getByRole('heading', { level: 1 })?.textContent?.trim()
 
     // Assert
     expect(title).toBe('Pages/index.vue')
@@ -30,14 +28,15 @@ describe('Index', () => {
 
   test('Input value should emit', async () => {
     // Arrange
+    const user = userEvent.setup({ delay: null })
     render(Index)
-    const input = screen.getByTestId('text-input') as HTMLInputElement
+    const input = screen.getByPlaceholderText('text')
 
     // Act
-    await fireEvent.update(input, 'Test')
+    await user.type(input, 'Test')
 
-    // Assert
-    expect(input.value).toBe('Test')
+    // Act
+    expect(screen.getByText('Input value = Test')).toBeTruthy()
   })
 
   test('UUID should get', async () => {
@@ -49,14 +48,13 @@ describe('Index', () => {
         }),
       }),
     )
+    const user = userEvent.setup({ delay: null })
     render(Index)
-    const uuidBtn = screen.getByText('Get uuid')
 
     // Act
-    await fireEvent.click(uuidBtn)
-    await waitPerfectly()
+    await user.click(screen.getByRole('button'))
 
     // Assert
-    expect(screen.getByText('UUID = Test uuid')).toBeDefined()
+    expect(screen.getByText('UUID = Test uuid')).toBeTruthy()
   })
 })
