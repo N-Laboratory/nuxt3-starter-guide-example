@@ -53,9 +53,9 @@ This project implement the following.
 1. [VeeValidate Testing](#veevalidate-testing)
 1. [Navigation guard](#navigation-guard)
 1. [Pinia Setup](#pinia-setup)
-1. [Storybook Setup](#storybook-setup)
 1. [Pinia Testing](#pinia-testing)
 1. [Data Fetching](#data-fetching)
+1. [Storybook Setup](#storybook-setup)
 1. [E2E Testing By Puppeteer](#e2e-testing-by-puppeteer)
 1. [Analyzing source code by SonarQube](#analyzing-source-code-by-sonarqube)
 
@@ -408,22 +408,32 @@ Add the following to package.json.
 
 ### Auto import configure
 
-Use below plugin because vitest does not import function that auto import by Nuxt.
+Use below plugin because vitest does not import function/components that auto import by Nuxt.
 ```bash
-# https://github.com/antfu/unplugin-auto-import
 npm install --save-dev unplugin-auto-import
+npm install --save-dev unplugin-vue-components
 ```
 Add plugins to vitest.config.ts
 ```ts
 // vitest.config.ts
+import AutoImportFunctions from 'unplugin-auto-import/vite'
+import AutoImportComponents from 'unplugin-vue-components/vite'
+
 export default defineConfig({
   plugins: [
     Vue(),
-    AutoImport({
-      // Set plugin name you want to import. You can set preset name.
-      // https://github.com/antfu/unplugin-auto-import/tree/main/src/presets
-      imports: ['vue', 'pinia', 'vue-router']
-    })
+    // Set plugin name you want to import. You can set preset name.
+    // https://github.com/antfu/unplugin-auto-import/tree/main/src/presets
+    AutoImportFunctions ({ imports: [
+      'vue',
+      'vee-validate',
+      'vue-router',
+      'pinia',
+    ], dts: 'auto-imports.d.ts' }),
+    AutoImportComponents({
+      dirs: ['src/components'],
+      dts: '.nuxt/components.d.ts',
+    }),
   ],
 })
 ```
@@ -491,13 +501,13 @@ import { render, screen } from '@testing-library/vue'
 import Index from './pages/index.vue'
 
 describe('Index', () => {
-  test('Index page should render page title', () => {
+  test('should render page title', () => {
     // Arrange
     render(Index)
     const title = screen.getByText('Pages/index.vue')
 
     // Assert
-    expect(title).toBeDefined()
+    expect(title).toBeTruthy()
   })
 })
 ```
@@ -616,7 +626,7 @@ const foo = (values: Record<string, any>) => {
 <template>
   <!-- Form configuration. See the following for more details -->
   <!-- https://vee-validate.logaretm.com/v4/api/use-form/#api-reference -->
-  <Form v-slot="{ meta, isSubmitting }" data-testid="validation-form" @submit="foo">
+  <Form v-slot="{ meta, isSubmitting }" @submit="foo">
     <Field rules="required|email" name="email" as="input" type="text" />
 
     <!-- Show error message -->
@@ -632,11 +642,6 @@ const foo = (values: Record<string, any>) => {
 ```
 
 ## VeeValidate [Testing](https://vee-validate.logaretm.com/v4/guide/testing) 
-```bash
-# flush-promises install
-npm install --save-dev flush-promises
-```
-
 To import vee-validate configuration, add setupFiles to vitest.config.ts.
 ```ts
 // vitest.config.ts
@@ -669,14 +674,6 @@ configure({
 Object.entries(all).forEach(([name, rule]) => {
   defineRule(name, rule)
 })
-
-// Call this method after you called fireEvent.
-// After call this method, your fireEvent operation will apply to HTML.
-export const waitPerfectly = async () => {
-  await flushPromises()
-  vi.runAllTimers()
-  await flushPromises()
-}
 ```
 
 Here is a sample test code of form validation.
@@ -697,9 +694,9 @@ const foo = (values: Record<string, any>) => {
 </script>
 
 <template>
-  <Form v-slot="{ meta, isSubmitting }" data-testid="validation-form" @submit="foo">
-    <Field rules="required|email" name="email" as="input" type="text" data-testid="input-email" />
-    <ErrorMessage name="email"  data-testid="email-error-msg" />
+  <Form v-slot="{ meta, isSubmitting }" @submit="foo">
+    <Field rules="required|email" name="email" as="input" type="text" placeholder="email" />
+    <ErrorMessage name="email" />
     <button :disabled="!meta.valid">Submit</button>
   </Form>
 </template>
@@ -707,29 +704,22 @@ const foo = (values: Record<string, any>) => {
 
 ```ts
 // form.spec.ts
-import { expect, test, vi } from 'vitest'
-import { fireEvent, render, screen } from '@testing-library/vue'
-import { waitPerfectly } from '/setup'
-import Form from './pages/index.vue'
+import { expect, test } from 'vitest'
+import { render, screen } from '@testing-library/vue'
+import userEvent from '@testing-library/user-event'
+import Form from './pages/form.vue'
 
-vi.useFakeTimers()
-
-test('the email field should be a valid email', async () => {
+test('should error message display', async () => {
   // Arrange
+  const user = userEvent.setup()
   render(Form)
-  const inputElement = screen.getByTestId('input-email') as HTMLInputElement
+  const email = screen.getByPlaceholderText('email')
 
   // Act
-  // Input a invalid value
-  await fireEvent.update(inputElement, 'abc')
-  await fireEvent.blur(inputElement)
-  // Apply html
-  await waitPerfectly()
-  // Get error message
-  const errorMsg = screen.getByTestId('email-error-msg')?.textContent
+  await user.type(email, 'abc{Tab}')
 
   // Assert
-  expect(errorMsg).toBe('The email field must be a valid email')
+  expect(screen.getByText('The email field must be a valid email')).toBeTruthy()
 })
 ```
 
@@ -947,8 +937,8 @@ test('store user info should set the initial value', () => {
   })
 
   // Assert
-  expect(screen.getByText('Email: test@test.com')).toBeDefined()
-  expect(screen.getByText('Password: test')).toBeDefined()
+  expect(screen.getByText('Email: test@test.com')).toBeTruthy()
+  expect(screen.getByText('Password: test')).toBeTruthy()
 })
 ```
 ## [Data Fetching](https://nuxt.com/docs/getting-started/data-fetching)
@@ -1322,7 +1312,7 @@ import path from 'path'
 import { defineWorkspace } from 'vitest/config'
 import { storybookTest } from '@storybook/experimental-addon-test/vitest-plugin'
 import { storybookVuePlugin } from '@storybook/vue3-vite/vite-plugin'
-import AutoImport from 'unplugin-auto-import/vite'
+import AutoImportFunctions from 'unplugin-auto-import/vite'
 import AutoImportComponents from 'unplugin-vue-components/vite'
 
 export default defineWorkspace([
@@ -1333,8 +1323,12 @@ export default defineWorkspace([
       storybookTest({ configDir: '.storybook' }),
       storybookVuePlugin(),
       // Import nuxt-auto-imports functions
-      AutoImport({
-        imports: ['vue', 'vue-router'],
+      AutoImportFunctions ({ imports: [
+        'vue',
+        'vee-validate',
+        'vue-router',
+        'pinia',
+      ], dts: '.storybook/auto-imports.d.ts',
       }),
       // Import nuxt-auto-imports components
       AutoImportComponents({
