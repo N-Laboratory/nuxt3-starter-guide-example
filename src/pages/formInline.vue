@@ -5,16 +5,16 @@ import { useUserStore } from '../store/user'
 const router = useRouter()
 const store = useUserStore()
 
-const submit = (values: Record<string, string>) => {
+const submit = async (values: Record<string, string>) => {
   store.setUserInfo(values.email, values.password)
-  router.push('/myPage')
+  await router.push('/myPage')
 }
 </script>
 
 <template>
   <div class="login-page">
     <div class="form">
-      <h1 data-testid="page-title">
+      <h1>
         Login
       </h1>
       <div class="login-form">
@@ -22,7 +22,6 @@ const submit = (values: Record<string, string>) => {
         <!-- show detail https://vee-validate.logaretm.com/v4/api/form/#slots -->
         <Form
           v-slot="{ meta, isSubmitting }"
-          data-testid="validation-form"
           @submit="submit"
         >
           <div class="field">
@@ -33,12 +32,11 @@ const submit = (values: Record<string, string>) => {
               type="text"
               class="form-text"
               placeholder="email"
-              data-testid="input-email"
             />
             <ErrorMessage
               name="email"
-              class="message invalid"
               data-testid="email-error-msg"
+              class="message invalid"
             />
           </div>
           <div class="field">
@@ -49,12 +47,11 @@ const submit = (values: Record<string, string>) => {
               type="text"
               class="form-text"
               placeholder="password"
-              data-testid="input-password"
             />
             <ErrorMessage
               name="password"
-              class="message invalid"
               data-testid="password-error-msg"
+              class="message invalid"
             />
           </div>
           <div class="field">
@@ -64,8 +61,8 @@ const submit = (values: Record<string, string>) => {
             <button
               :disabled="isSubmitting || !meta.valid"
               :class="{ 'btn-disabled': isSubmitting || !meta.valid }"
-              class="form-submit"
               data-testid="submit-btn"
+              class="form-submit"
             >
               Submit
             </button>

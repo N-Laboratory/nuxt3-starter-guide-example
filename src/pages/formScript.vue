@@ -12,19 +12,19 @@ const { handleSubmit, errors, isSubmitting, meta } = useForm({
   },
 })
 
-const { value: password } = useField('password')
-const { value: email } = useField('email')
+const { value: password } = useField<string>('password')
+const { value: email } = useField<string>('email')
 
-const submit = handleSubmit(() => {
-  store.setUserInfo(email.value as string, password.value as string)
-  router.push('/myPage')
+const submit = handleSubmit(async () => {
+  store.setUserInfo(email.value, password.value)
+  await router.push('/myPage')
 })
 </script>
 
 <template>
   <div class="login-page">
     <div class="form">
-      <h1 data-testid="page-title">
+      <h1>
         Login
       </h1>
       <div class="login-form">
@@ -35,12 +35,11 @@ const submit = handleSubmit(() => {
             type="text"
             name="email"
             placeholder="email"
-            data-testid="input-email"
           >
           <span
             v-if="errors.email"
-            class="message invalid"
             data-testid="email-error-msg"
+            class="message invalid"
           >{{ errors.email }}</span>
         </div>
         <div class="field">
@@ -50,12 +49,11 @@ const submit = handleSubmit(() => {
             type="text"
             name="password"
             placeholder="password"
-            data-testid="input-password"
           >
           <span
             v-if="errors.password"
-            class="message invalid"
             data-testid="password-error-msg"
+            class="message invalid"
           >{{ errors.password }}</span>
         </div>
         <div class="field">
@@ -65,8 +63,8 @@ const submit = handleSubmit(() => {
           <button
             :disabled="isSubmitting || !meta.valid"
             :class="{ 'btn-disabled': isSubmitting || !meta.valid }"
-            class="form-submit"
             data-testid="submit-btn"
+            class="form-submit"
             @click="submit"
           >
             Submit

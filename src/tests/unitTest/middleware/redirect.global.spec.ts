@@ -22,6 +22,7 @@ describe('RedirectMiddleware', () => {
     updateGuards: new Set(),
     enterCallbacks: { test: [] },
     instances: { test: null },
+    mods: {},
   }
 
   afterEach(() => {

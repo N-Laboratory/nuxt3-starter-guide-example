@@ -1,10 +1,8 @@
 import { beforeEach, describe, expect, test, vi } from 'vitest'
-import { fireEvent, render, screen } from '@testing-library/vue'
+import { render, screen, waitFor } from '@testing-library/vue'
 import { setActivePinia, createPinia } from 'pinia'
-import { waitPerfectly } from '../setup'
+import userEvent from '@testing-library/user-event'
 import Form from '~/pages/formScript.vue'
-
-vi.useFakeTimers()
 
 const mockPush = vi.fn()
 
@@ -26,9 +24,7 @@ describe('Form', () => {
     test('page should render', () => {
       // Arrange
       render(Form)
-
-      // You need to call trim() because textContent return text with spaces added back and forth.
-      const title = screen.getByTestId('page-title')?.textContent?.trim()
+      const title = screen.getByRole('heading', { level: 1 })?.textContent?.trim()
 
       // Assert
       expect(title).toBe('Login')
@@ -38,12 +34,11 @@ describe('Form', () => {
       // Arrange
       render(Form)
 
-      // You have to call flushPromises after render() called because HTMLButtonElement.disabled always return false in the initial state.
-      await waitPerfectly()
-      const isDisabled = (screen.getByTestId('submit-btn') as HTMLButtonElement).disabled
-
-      // Assert
-      expect(isDisabled).toBeTruthy()
+      await waitFor(async () => {
+        // Assert
+        const isDisabled = (await screen.findByRole('button') as HTMLButtonElement).disabled
+        expect(isDisabled).toBe(true)
+      })
     })
   })
 
@@ -57,81 +52,68 @@ describe('Form', () => {
         inputName,
       ) => {
         // Arrange
+        const user = userEvent.setup()
         render(Form)
-        const inputElement = screen.getByTestId(`input-${inputName}`) as HTMLInputElement
+        const inputElement = screen.getByPlaceholderText(inputName)
 
         // Act
-        await fireEvent.update(inputElement, '')
-        await waitPerfectly()
-        const errorMsg = screen.getByTestId(`${inputName}-error-msg`)?.textContent
+        await user.type(inputElement, 'test')
+        await user.clear(inputElement)
 
         // Assert
-        expect(errorMsg).toBe(`The ${inputName} field is required`)
+        expect(await screen.findByText(`The ${inputName} field is required`)).toBeTruthy()
       })
 
     test('the email field should be a valid email', async () => {
       // Arrange
+      const user = userEvent.setup()
       render(Form)
-      const inputElement = screen.getByTestId('input-email') as HTMLInputElement
+      const email = screen.getByPlaceholderText('email')
 
       // Act
-      await fireEvent.update(inputElement, 'abc')
-      await waitPerfectly()
-      const errorMsgInputInvalidValue = screen.getByTestId('email-error-msg')?.textContent
-
-      await fireEvent.update(inputElement, 'abc@abc.com')
-      await waitPerfectly()
-      const errorMsgInputValidValue = screen.queryByTestId('email-error-msg')?.textContent
+      await user.type(email, 'test')
+      const errorMsgWithInvalidValue = await screen.findByText('The email field must be a valid email')
+      await user.type(email, 'abc@abc.com')
 
       // Assert
-      expect(errorMsgInputInvalidValue).toBe('The email field must be a valid email')
-      expect(errorMsgInputValidValue).toBeFalsy()
+      expect(errorMsgWithInvalidValue).toBeTruthy()
+      await waitFor(() => {
+        const errorMsgWithValidValue = screen.queryByText('The email field must be a valid email')
+        expect(errorMsgWithValidValue).toBeNull()
+      })
     })
 
     test('if all field is valid、submit button should be enabled', async () => {
       // Arrange
+      const user = userEvent.setup()
       render(Form)
-      // You have to call flushPromises after render() called because HTMLButtonElement.disabled always return false in the initial state.
-      await waitPerfectly()
 
       // Act
-      const emailInputElement = screen.getByTestId('input-email') as HTMLInputElement
-      await fireEvent.update(emailInputElement, 'abc@abc.com')
-      await waitPerfectly()
+      await user.type(screen.getByPlaceholderText('email'), 'abc@abc.com')
+      await user.type(screen.getByPlaceholderText('password'), '123')
 
-      const passwordInputElement = screen.getByTestId('input-password') as HTMLInputElement
-      await fireEvent.update(passwordInputElement, '123')
-      await waitPerfectly()
-
-      const submitElement = screen.getByTestId('submit-btn') as HTMLButtonElement
-      await fireEvent.click(submitElement)
-      await waitPerfectly()
-
-      // Assert
-      expect(submitElement.disabled).toBe(false)
+      await waitFor(() => {
+        // Assert
+        const isDisabled = (screen.getByRole('button') as HTMLButtonElement).disabled
+        expect(isDisabled).toBe(false)
+      })
     })
 
     test('if click submit button, submission function should run', async () => {
-      const submitFn = vi.fn()
-
       // Arrange
-      render(Form, { global: { mocks: { submit: submitFn } } })
-
-      const emailInputElement = screen.getByTestId('input-email') as HTMLInputElement
-      await fireEvent.update(emailInputElement, 'abc@abc.com')
-      await waitPerfectly()
-
-      const passwordInputElement = screen.getByTestId('input-password') as HTMLInputElement
-      await fireEvent.update(passwordInputElement, '123')
-      await waitPerfectly()
+      const user = userEvent.setup()
+      render(Form)
+      await user.type(screen.getByPlaceholderText('email'), 'abc@abc.com')
+      await user.type(screen.getByPlaceholderText('password'), '123')
 
       // Act
-      await fireEvent.click((screen.getByTestId('submit-btn') as HTMLButtonElement))
-      await waitPerfectly()
+      await user.click(screen.getByRole('button'))
 
       // Assert
-      expect(submitFn).toHaveBeenCalledOnce()
-      expect(mockPush).toHaveBeenCalledWith('/myPage')
+      await waitFor(() => {
+        // Assert
+        expect(mockPush).toHaveBeenCalledWith('/myPage')
+      })
     })
   })
 })
