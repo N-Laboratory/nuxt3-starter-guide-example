@@ -7,13 +7,35 @@ import en from '@vee-validate/i18n/dist/locale/en.json'
 import { all } from '@vee-validate/rules'
 import { defineRule, configure } from 'vee-validate'
 import { initialize, mswLoader } from 'msw-storybook-addon'
+import { createMemoryHistory, createRouter } from 'vue-router'
+import Form from '../src/pages/formScript.vue'
+import MyPage from '../src/pages/myPage.vue'
+
+const routes = [
+  {
+    path: '/',
+    name: 'Form',
+    component: Form,
+  },
+  {
+    path: '/myPage',
+    name: 'MyPage',
+    component: MyPage,
+  },
+]
+const router = createRouter({
+  history: createMemoryHistory(),
+  routes,
+})
 
 const pinia = createPinia()
+
 initialize({
   onUnhandledRequest: 'bypass',
 })
 setup((app: App) => {
   app.use(pinia)
+  app.use(router)
 })
 
 configure({
