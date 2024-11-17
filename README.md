@@ -713,10 +713,9 @@ test('should error message display', async () => {
   // Arrange
   const user = userEvent.setup()
   render(Form)
-  const email = screen.getByPlaceholderText('email')
 
   // Act
-  await user.type(email, 'abc{Tab}')
+  await user.type(screen.getByPlaceholderText('email'), 'abc{Tab}')
 
   // Assert
   expect(screen.getByText('The email field must be a valid email')).toBeTruthy()
@@ -1090,7 +1089,12 @@ const config: StorybookConfig = {
     if (config?.plugins) {
       // add this
       config.plugins.push(
-        AutoImportFunctions ({ imports: ['vue', 'vee-validate', 'vue-router', 'pinia'], dts: '.storybook/auto-imports.d.ts' }),
+        AutoImportFunctions ({ imports: [
+          'vue',
+          'vee-validate',
+          'vue-router',
+          'pinia',
+        ], dts: '.storybook/auto-imports.d.ts' }),
       )
     }
     return config
@@ -1417,10 +1421,9 @@ export const GetUuid: Story = {
   play: async ({ canvasElement }) => {
     // Arrange
     const canvas = within(canvasElement)
-    const button = await canvas.findByText('Get uuid')
 
     // Act
-    await userEvent.click(button)
+    await userEvent.click(await canvas.findByText('Get uuid'))
 
     // Assert
     await expect(canvas.getByText('UUID = test uuid')).toBeInTheDocument()
@@ -1586,6 +1589,7 @@ sonar.javascript.file.suffixes=.js,.jsx
 sonar.typescript.file.suffixes=.ts,.tsx,.vue
 sonar.typescript.lcov.reportPaths=coverage/lcov.info
 sonar.javascript.lcov.reportPaths=coverage/lcov.info
+sonar.host.url=http://localhost:9000
 sonar.token=sqp_XXXXXXXXXXXXXXXXXXXXXX
 ```
 

@@ -36,10 +36,9 @@ export const GetUuid: Story = {
   play: async ({ canvasElement }) => {
     // Arrange
     const canvas = within(canvasElement)
-    const button = await canvas.findByText('Get uuid')
 
     // Act
-    await userEvent.click(button)
+    await userEvent.click(await canvas.findByText('Get uuid'))
 
     // Assert
     await expect(await canvas.findByText('UUID = test uuid')).toBeInTheDocument()
