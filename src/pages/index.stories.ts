@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
 import { http, HttpResponse } from 'msw'
-import { within, userEvent } from '@storybook/test'
+import { within, userEvent, expect } from '@storybook/test'
 import Index from './index.vue'
 
 type Story = StoryObj<typeof Index>
@@ -8,6 +8,7 @@ type Story = StoryObj<typeof Index>
 const meta: Meta<typeof Index> = {
   title: 'Index',
 }
+export default meta
 
 export const Default: Story = {
   render: () => ({
@@ -41,8 +42,6 @@ export const GetUuid: Story = {
     await userEvent.click(button)
 
     // Assert
-    await canvas.findByText('UUID = test uuid')
+    await expect(await canvas.findByText('UUID = test uuid')).toBeInTheDocument()
   },
 }
-
-export default meta
