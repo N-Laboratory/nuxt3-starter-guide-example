@@ -3,7 +3,6 @@ import en from '@vee-validate/i18n/dist/locale/en.json'
 import { all } from '@vee-validate/rules'
 import { defineRule, configure } from 'vee-validate'
 import { vi } from 'vitest'
-import flushPromises from 'flush-promises'
 import type { RouteLocationNormalized, NavigationGuard } from 'vue-router'
 
 // stub defineNuxtRouteMiddleware
