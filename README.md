@@ -23,8 +23,7 @@
   日本語版はこちら
 </a>
 
-This project is a template nuxt 3 project compatible with nuxt 3.12.
-If your nuxt versions less than 3.12, please check here: https://github.com/N-Laboratory/nuxt3-starter-guide-example/releases/tag/v1.0
+This project is a template nuxt 3 project.
 
 The minimum required functions are implemented as a template project and the essentials are explained.
 This project also implement unit testing, E2E testing, and analyzing source code by SonarQube.
