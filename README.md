@@ -584,7 +584,7 @@ const { handleSubmit, errors, isSubmitting, meta } = useForm({
 })
 
 // Field configuration
-const { value: email } = useField('email')
+const { value: email } = useField<string>('email')
 
 // If you click submit button, this function called.
 const foo = () => {
@@ -1292,7 +1292,7 @@ initialize({
 })
 ```
 
-### Run tests inside Storybook
+### Run interaction testing inside Storybook
 Storybook's test addon allows you to test your components directly inside Storybook. It does this by using a Vitest plugin to transform your stories into Vitest tests using portable stories.
 
 Before installing, make sure your project meets the following requirements:
@@ -1396,6 +1396,7 @@ type Story = StoryObj<typeof Index>
 const meta: Meta<typeof Index> = {
   title: 'Index',
 }
+export default meta
 
 export const GetUuid: Story = {
   render: () => ({
@@ -1422,11 +1423,9 @@ export const GetUuid: Story = {
     await userEvent.click(button)
 
     // Assert
-    await canvas.findByText('UUID = test uuid')
+    await expect(canvas.getByText('UUID = test uuid')).toBeInTheDocument()
   },
 }
-
-export default meta
 ```
 Run the following command to run tests.
 ```bash
