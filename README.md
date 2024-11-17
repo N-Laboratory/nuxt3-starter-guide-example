@@ -23,6 +23,7 @@
   日本語版はこちら
 </a>
 
+
 This project is a template nuxt 3 project.
 
 The minimum required functions are implemented as a template project and the essentials are explained.
