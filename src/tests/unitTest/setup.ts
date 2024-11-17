@@ -27,11 +27,3 @@ configure({
 Object.entries(all).forEach(([name, rule]) => {
   defineRule(name, rule)
 })
-
-// Call this method after you called fireEvent.
-// After call this method, your fireEvent operation will apply to HTML.
-export const waitPerfectly = async () => {
-  await flushPromises()
-  vi.runAllTimers()
-  await flushPromises()
-}
