@@ -38,6 +38,7 @@ const submit = handleSubmit(async () => {
           >
           <span
             v-if="errors.email"
+            data-testid="email-error-msg"
             class="message invalid"
           >{{ errors.email }}</span>
         </div>
@@ -51,6 +52,7 @@ const submit = handleSubmit(async () => {
           >
           <span
             v-if="errors.password"
+            data-testid="password-error-msg"
             class="message invalid"
           >{{ errors.password }}</span>
         </div>
@@ -61,6 +63,7 @@ const submit = handleSubmit(async () => {
           <button
             :disabled="isSubmitting || !meta.valid"
             :class="{ 'btn-disabled': isSubmitting || !meta.valid }"
+            data-testid="submit-btn"
             class="form-submit"
             @click="submit"
           >

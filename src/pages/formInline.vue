@@ -35,6 +35,7 @@ const submit = async (values: Record<string, string>) => {
             />
             <ErrorMessage
               name="email"
+              data-testid="email-error-msg"
               class="message invalid"
             />
           </div>
@@ -49,6 +50,7 @@ const submit = async (values: Record<string, string>) => {
             />
             <ErrorMessage
               name="password"
+              data-testid="password-error-msg"
               class="message invalid"
             />
           </div>
@@ -59,6 +61,7 @@ const submit = async (values: Record<string, string>) => {
             <button
               :disabled="isSubmitting || !meta.valid"
               :class="{ 'btn-disabled': isSubmitting || !meta.valid }"
+              data-testid="submit-btn"
               class="form-submit"
             >
               Submit

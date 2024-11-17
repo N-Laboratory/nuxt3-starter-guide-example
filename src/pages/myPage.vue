@@ -9,15 +9,21 @@ const password = store.user.password
 <template>
   <div class="mypage">
     <div class="form">
-      <h1>
+      <h1 data-testid="page-title">
         MyPage
       </h1>
       <div>
         <div class="field">
-          Email: <span v-text="email" />
+          Email: <span
+            data-testid="page-email"
+            v-text="email"
+          />
         </div>
         <div class="field">
-          Password: <span v-text="password" />
+          Password: <span
+            data-testid="page-password"
+            v-text="password"
+          />
         </div>
       </div>
     </div>
