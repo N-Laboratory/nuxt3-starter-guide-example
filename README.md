@@ -1170,7 +1170,7 @@ export const Default: Story = {
       store.user.password = 'foobar'
     },
     components: { Index },
-    template: '<Index />',
+    template: '<Indesx />',
   }),
 }
 
