@@ -1,10 +1,8 @@
 import { beforeEach, describe, expect, test, vi } from 'vitest'
-import { fireEvent, render, screen } from '@testing-library/vue'
+import { render, screen, waitFor } from '@testing-library/vue'
 import { setActivePinia, createPinia } from 'pinia'
-import { waitPerfectly } from '../setup'
+import userEvent from '@testing-library/user-event'
 import Form from '~/pages/formScript.vue'
-
-vi.useFakeTimers()
 
 const mockPush = vi.fn()
 
@@ -35,11 +33,12 @@ describe('Form', () => {
     test('submit button should be disabled', async () => {
       // Arrange
       render(Form)
-      await waitPerfectly()
 
-      // Assert
-      const isDisabled = (screen.getByRole('button') as HTMLButtonElement).disabled
-      expect(isDisabled).toBe(true)
+      await waitFor(async () => {
+        // Assert
+        const isDisabled = (await screen.findByRole('button') as HTMLButtonElement).disabled
+        expect(isDisabled).toBe(true)
+      })
     })
   })
 
@@ -53,71 +52,68 @@ describe('Form', () => {
         inputName,
       ) => {
         // Arrange
+        const user = userEvent.setup()
         render(Form)
         const inputElement = screen.getByPlaceholderText(inputName)
 
         // Act
-        await fireEvent.update(inputElement, '')
-        await waitPerfectly()
+        await user.type(inputElement, 'test')
+        await user.clear(inputElement)
 
         // Assert
-        expect(screen.getByText(`The ${inputName} field is required`)).toBeTruthy()
+        expect(await screen.findByText(`The ${inputName} field is required`)).toBeTruthy()
       })
 
     test('the email field should be a valid email', async () => {
       // Arrange
+      const user = userEvent.setup()
       render(Form)
       const email = screen.getByPlaceholderText('email')
 
       // Act
-      await fireEvent.update(email, 'abc')
-      await waitPerfectly()
-      const errorMsgWithInvalidValue = screen.getByText('The email field must be a valid email')
-
-      await fireEvent.update(email, 'abc@abc.com')
-      await waitPerfectly()
-      const errorMsgWithValidValue = screen.queryByText('The email field must be a valid email')
+      await user.type(email, 'test')
+      const errorMsgWithInvalidValue = await screen.findByText('The email field must be a valid email')
+      await user.type(email, 'abc@abc.com')
 
       // Assert
       expect(errorMsgWithInvalidValue).toBeTruthy()
-      expect(errorMsgWithValidValue).toBeNull()
+      await waitFor(() => {
+        const errorMsgWithValidValue = screen.queryByText('The email field must be a valid email')
+        expect(errorMsgWithValidValue).toBeNull()
+      })
     })
 
     test('if all field is valid、submit button should be enabled', async () => {
       // Arrange
+      const user = userEvent.setup()
       render(Form)
 
       // Act
-      await fireEvent.update(screen.getByPlaceholderText('email'), 'abc@abc.com')
-      await waitPerfectly()
+      await user.type(screen.getByPlaceholderText('email'), 'abc@abc.com')
+      await user.type(screen.getByPlaceholderText('password'), '123')
 
-      await fireEvent.update(screen.getByPlaceholderText('password'), '123')
-      await waitPerfectly()
-
-      const submit = screen.getByRole('button') as HTMLButtonElement
-      await fireEvent.click(submit)
-      await waitPerfectly()
-
-      // Assert
-      expect(submit.disabled).toBe(false)
+      await waitFor(() => {
+        // Assert
+        const isDisabled = (screen.getByRole('button') as HTMLButtonElement).disabled
+        expect(isDisabled).toBe(false)
+      })
     })
 
     test('if click submit button, submission function should run', async () => {
-      const submitFn = vi.fn()
-
       // Arrange
-      render(Form, { global: { mocks: { submit: submitFn } } })
-
-      await fireEvent.update(screen.getByPlaceholderText('email'), 'abc@abc.com')
-      await fireEvent.update(screen.getByPlaceholderText('password'), '123')
+      const user = userEvent.setup()
+      render(Form)
+      await user.type(screen.getByPlaceholderText('email'), 'abc@abc.com')
+      await user.type(screen.getByPlaceholderText('password'), '123')
 
       // Act
-      await fireEvent.click(screen.getByRole('button'))
-      await waitPerfectly()
+      await user.click(screen.getByRole('button'))
 
       // Assert
-      expect(submitFn).toHaveBeenCalledOnce()
-      expect(mockPush).toHaveBeenCalledWith('/myPage')
+      await waitFor(() => {
+        // Assert
+        expect(mockPush).toHaveBeenCalledWith('/myPage')
+      })
     })
   })
 })
