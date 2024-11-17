@@ -12,12 +12,12 @@ const { handleSubmit, errors, isSubmitting, meta } = useForm({
   },
 })
 
-const { value: password } = useField('password')
-const { value: email } = useField('email')
+const { value: password } = useField<string>('password')
+const { value: email } = useField<string>('email')
 
-const submit = handleSubmit(() => {
-  store.setUserInfo(email.value as string, password.value as string)
-  router.push('/myPage')
+const submit = handleSubmit(async () => {
+  store.setUserInfo(email.value, password.value)
+  await router.push('/myPage')
 })
 </script>
 

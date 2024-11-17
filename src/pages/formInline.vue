@@ -5,9 +5,9 @@ import { useUserStore } from '../store/user'
 const router = useRouter()
 const store = useUserStore()
 
-const submit = (values: Record<string, string>) => {
+const submit = async (values: Record<string, string>) => {
   store.setUserInfo(values.email, values.password)
-  router.push('/myPage')
+  await router.push('/myPage')
 }
 </script>
 
