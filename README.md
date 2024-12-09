@@ -367,7 +367,7 @@ Delete prettier commands from npm scripts in package.json.
 
 ```bash
 # install Vitest
-npm install --save-dev vitest @testing-library/vue happy-dom
+npm install --save-dev vitest @testing-library/user-event @testing-library/vue happy-dom
 ```
 
 Create vitest.config.ts in root directory and add the following to vitest.config.ts.
@@ -375,8 +375,6 @@ Create vitest.config.ts in root directory and add the following to vitest.config
 // vitest.config.ts
 import path from 'path'
 import { defineConfig } from 'vitest/config'
-import Vue from '@vitejs/plugin-vue'
-import AutoImport from 'unplugin-auto-import/vite'
 
 export default defineConfig({
   resolve: {
@@ -416,6 +414,7 @@ npm install --save-dev unplugin-vue-components
 Add plugins to vitest.config.ts
 ```ts
 // vitest.config.ts
+import Vue from '@vitejs/plugin-vue'
 import AutoImportFunctions from 'unplugin-auto-import/vite'
 import AutoImportComponents from 'unplugin-vue-components/vite'
 
@@ -440,7 +439,7 @@ export default defineConfig({
 You can set custom plugin like this.
 ```ts
 // vitest.config.ts
-AutoImport({
+AutoImportFunctions({
   imports: [
     {
       "nuxt/app": [
@@ -485,8 +484,8 @@ Add --coverage to the following item in package.json.
 ```
 
 Add index.vue to pages directory.
-```vue
-// index.vue
+```ts
+// pages/index.vue
 <template>
   <h1>
     Pages/index.vue
@@ -498,7 +497,7 @@ Here is a test code of index.vue.
 ```ts
 import { describe, expect, test } from 'vitest'
 import { render, screen } from '@testing-library/vue'
-import Index from './pages/index.vue'
+import Index from '../pages/index.vue'
 
 describe('Index', () => {
   test('should render page title', () => {
@@ -542,7 +541,7 @@ npm install --save-dev vee-validate @vee-validate/i18n @vee-validate/rules
 ```
 Create vee-validate-plugin.ts in plugins directory and add the following to vee-validate-plugin.ts.
 ```ts
-// vee-validate-plugin.ts
+// plugins/vee-validate-plugin.ts
 import { localize } from '@vee-validate/i18n'
 import en from '@vee-validate/i18n/dist/locale/en.json'
 import { all } from '@vee-validate/rules'
@@ -618,7 +617,7 @@ If you implement validation in html, use Form/Field components.
 import { Form, Field, ErrorMessage } from 'vee-validate'
 
 // If you click submit button, this function called.
-const foo = (values: Record<string, any>) => {
+const foo = (values: Record<string, string>) => {
   console.log(values.email)
 }
 </script>
@@ -655,13 +654,11 @@ export default defineConfig({
 
 Create setup.ts in src/tests/unitTest and add the following to setup.ts.
 ```ts
-// setup.ts
+// src/tests/unitTest/setup.ts
 import { localize } from '@vee-validate/i18n'
 import en from '@vee-validate/i18n/dist/locale/en.json'
 import { all } from '@vee-validate/rules'
 import { defineRule, configure } from 'vee-validate'
-import { vi } from 'vitest'
-import flushPromises from 'flush-promises'
 
 // vee-validate setup
 configure({
@@ -688,13 +685,13 @@ See the following for more details.
 <script lang="ts" setup>
 import { Form, Field, ErrorMessage } from 'vee-validate'
 
-const foo = (values: Record<string, any>) => {
+const foo = (values: Record<string, string>) => {
   console.log(values.email)
 }
 </script>
 
 <template>
-  <Form v-slot="{ meta, isSubmitting }" @submit="foo">
+  <Form v-slot="{ meta }" @submit="foo">
     <Field rules="required|email" name="email" as="input" type="text" placeholder="email" />
     <ErrorMessage name="email" />
     <button :disabled="!meta.valid">Submit</button>
@@ -707,7 +704,7 @@ const foo = (values: Record<string, any>) => {
 import { expect, test } from 'vitest'
 import { render, screen } from '@testing-library/vue'
 import userEvent from '@testing-library/user-event'
-import Form from './pages/form.vue'
+import Form from '~/pages/form.vue'
 
 test('should error message display', async () => {
   // Arrange
@@ -741,7 +738,7 @@ Here is a sample code. See [this](https://nuxt.com/docs/guide/directory-structur
 
 
 ```ts
-// redirect.global.ts
+// middleware/redirect.global.ts
 export default defineNuxtRouteMiddleware((to, from) => {
   // If you access /
   if (to.path === '/') {
@@ -788,12 +785,12 @@ export default defineNuxtConfig({
     modules: [
         ['@pinia/nuxt',
             {
-                autoImports: [
-                  // Import defineStore
-                  'defineStore'
-                ]
-                // If you use vuex at the same time, add the following
-                // disableVuex: false
+              autoImports: [
+                // Import defineStore
+                'defineStore'
+              ]
+              // If you use vuex at the same time, add the following
+              // disableVuex: false
             }
         ]
     ]
@@ -802,7 +799,7 @@ export default defineNuxtConfig({
 ### Store implementation
 Create user.ts in store directory and add the following to user.ts.
 ```ts
-// user.ts
+// store/user.ts
 // If you add defineStore to autoImports in nuxt.config.ts, you don't need to import below
 import { defineStore } from 'pinia'
 
@@ -823,9 +820,9 @@ export const useUserStore = defineStore('user', {
 
 Here is a sample code using store from vue file.
 ```ts
-// store.vue
+// pages/store.vue
 <script lang="ts" setup>
-import { useUserStore } from '../store/user'
+import { useUserStore } from '~/store/user'
 
 // Use store
 const store = useUserStore()
@@ -855,7 +852,7 @@ To avoid this error, call setActivePinia function in beforeEach.
 ```ts
 import { beforeEach, describe, expect, test } from 'vitest'
 import { setActivePinia, createPinia } from 'pinia'
-import { useUserStore } from '../../../store/user'
+import { useUserStore } from '~/store/user'
 
 const initialUser = {
   email: '',
@@ -894,9 +891,10 @@ describe('Store', () => {
 
 You can set the initial state of all of your stores when creating a testing pinia by passing an initialState.
 See [this](https://pinia.vuejs.org/cookbook/testing.html#initial-state) for more details.
-```vue
+```ts
+pages/index.vue
 <script lang="ts" setup>
-import { useUserStore } from '../store/user'
+import { useUserStore } from '~/store/user'
 
 const store = useUserStore()
 const email = store.user.email
@@ -915,7 +913,7 @@ import { beforeEach, expect, test } from 'vitest'
 import { render, screen } from '@testing-library/vue'
 import { setActivePinia, createPinia } from 'pinia'
 import { createTestingPinia } from '@pinia/testing'
-import Foo from './pages/index.vue'
+import Foo from '~/pages/index.vue'
 
 beforeEach(() => {
   setActivePinia(createPinia())
@@ -1017,11 +1015,6 @@ Install [@nuxtjs/storybook](https://storybook.nuxtjs.org/getting-started/setup) 
 ```bash
 npx nuxi@latest module add storybook
 ```
-After installation this library, the following command will start nuxt and Storybook at the same time.
-```bash
-npm run dev
-```
-
 Add the following to modules in nuxt.config.ts.
 ```ts
 // nuxt.config.ts
@@ -1029,6 +1022,12 @@ export default defineNuxtConfig({
   modules: ['@nuxtjs/storybook'],
 })
 ```
+
+After installation this library, the following command will start nuxt and Storybook at the same time.
+```bash
+npm run dev
+```
+
 You can edit the storybook configuration with the storybook property in nuxt.config.ts.
 
 Add the following to nuxt.config.ts. See [more options](https://storybook.nuxtjs.org/getting-started/options).
@@ -1139,7 +1138,7 @@ To aboid this, add the follwing to .storybook/preview.ts.
 ```ts
 // .storybook/preview.ts
 import { type Preview, setup } from '@storybook/vue3'
-import { type App } from 'vue'
+import type { App } from 'vue'
 import { createPinia } from 'pinia'
 
 const pinia = createPinia()
@@ -1170,7 +1169,7 @@ export const Default: Story = {
       store.user.password = 'foobar'
     },
     components: { Index },
-    template: '<Indesx />',
+    template: '<Index />',
   }),
 }
 
@@ -1209,9 +1208,9 @@ Use msw to mock Rest and GraphQL requests right inside your story in storybook. 
 npm install --save-dev msw msw-storybook-addon
 npx msw init public/
 ```
-Enable MSW in Storybook by initializing MSW and providing the MSW decorator in ./storybook/preview.js
+Enable MSW in Storybook by initializing MSW and providing the MSW decorator in ./storybook/preview.ts
 ```ts
-// .storybook\preview.ts
+// .storybook/preview.ts
 import { initialize, mswLoader } from 'msw-storybook-addon'
 
 // Initialize MSW
@@ -1226,7 +1225,7 @@ export default preview
 ```
 Then ensure the staticDirs property in your Storybook configuration will include the generated service worker file (in /public, by default).
 ```ts
-// .storybook\main.ts
+// .storybook/main.ts
 const config: StorybookConfig = {
   staticDirs: ['../public'],
 }
@@ -1234,7 +1233,7 @@ export default config
 ```
 Here is an example uses the fetch API to make network requests.
 ```ts
-// index.vue
+// pages/index.vue
 <script lang="ts" setup>
 import { useFetch } from '@vueuse/core'
 
@@ -1247,13 +1246,13 @@ const handleClick = async () => {
 
 <template>
   <div>
-    <input type="submit" value="Get uuid" @click="handleClick">
+    <button @click="handleClick">Get uuid</button>
     <p>UUID = {{ uuid }}</p>
   </div>
 </template>
 ```
 ```ts
-// index.stories.ts
+// pages/index.stories.ts
 import type { Meta, StoryObj } from '@storybook/vue3'
 import { http, HttpResponse } from 'msw'
 import Index from './index.vue'
@@ -1288,7 +1287,7 @@ msw-storybook-addon starts MSW with default configuration. If you want to config
 A common example is to configure the onUnhandledRequest behavior, as MSW logs a warning in case there are requests which were not handled.
 If you want MSW to bypass unhandled requests and not do anything:
 ```ts
-// preview.ts
+// .storybook/preview.ts
 import { initialize } from 'msw-storybook-addon';
 
 initialize({
@@ -1363,14 +1362,14 @@ export default defineWorkspace([
 Add the follwing to scripts in package.json.
 --project=storybook will run tests only stories.ts.
 ```json
-  "scripts": {
-    "test:storybook": "vitest --project=storybook",
-  },
+"scripts": {
+  "test:storybook": "vitest --project=storybook",
+},
 ```
 
 Here is an example.
 ```ts
-// index.vue
+// pages/index.vue
 <script lang="ts" setup>
 import { useFetch } from '@vueuse/core'
 
@@ -1389,10 +1388,10 @@ const handleClick = async () => {
 </template>
 ```
 ```ts
-// index.stories.ts
+// pages/index.stories.ts
 import type { Meta, StoryObj } from '@storybook/vue3'
 import { http, HttpResponse } from 'msw'
-import { within, userEvent } from '@storybook/test'
+import { within, userEvent, expect } from '@storybook/test'
 import Index from './index.vue'
 
 type Story = StoryObj<typeof Index>
@@ -1426,7 +1425,7 @@ export const GetUuid: Story = {
     await userEvent.click(await canvas.findByText('Get uuid'))
 
     // Assert
-    await expect(canvas.getByText('UUID = test uuid')).toBeInTheDocument()
+    await expect(await canvas.findByText('UUID = test uuid')).toBeInTheDocument()
   },
 }
 ```
@@ -1441,7 +1440,16 @@ Most things that you can do manually in the browser can be done using Puppeteer 
 # install Puppeteer
 npm install --save-dev puppeteer
 ```
-```vue
+
+Add the follwing to scripts in package.json.
+```json
+"scripts": {
+  "test:e2e": "vitest ./src/tests/e2eTest/",
+},
+```
+The following is an example implementation. When the email address and password are entered, the submit button is activated. This E2E test verifies whether the submit button is activated after inputting the information.
+```ts
+// pages/foo.vue
 <script lang="ts" setup>
 import { Form, Field } from 'vee-validate'
 </script>
@@ -1469,12 +1477,12 @@ import { Form, Field } from 'vee-validate'
   </Form>
 </template>
 ```
-Here is a sample E2E testing code.
-It tests submit button state.
 ```ts
+// ./src/tests/e2eTest/foo.spec.ts
 import { afterAll, beforeAll, describe, expect, test } from 'vitest'
-import { launch, PuppeteerLaunchOptions } from 'puppeteer'
-import type { Browser, Page } from 'puppeteer'
+import { launch } from 'puppeteer'
+// If you can not import PuppeteerLaunchOptions, use LaunchOptions instead of PuppeteerLaunchOptions.
+import type { Browser, Page, PuppeteerLaunchOptions } from 'puppeteer'
 
 // Set browser launch option. See the following for more details.
 // https://pptr.dev/api/puppeteer.browserlaunchargumentoptions
@@ -1522,7 +1530,7 @@ describe('E2E', () => {
 
         // Take a screenshot
         await page.screenshot({
-          path: './src/tests/e2eTest/evidence/pages/foo/test-01.png',
+          path: './src/tests/e2eTest/e2e-test.png',
           fullPage: true
         })
 
@@ -1535,14 +1543,7 @@ describe('E2E', () => {
     }, 60000)
 })
 ```
-To run E2E testing, add the test file path to config:path in package.json.
-```json
-{
-  "config": {
-    "path": "./src/tests/e2eTest/spec/foo.spec.ts"
-  },
-}
-```
+
 ```bash
 # run application server
 npm run dev
