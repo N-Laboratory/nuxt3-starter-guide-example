@@ -36,7 +36,7 @@ describe('Index', () => {
     await user.type(input, 'Test')
 
     // Act
-    expect(screen.getByText('Input value = Test')).toBeTruthy()
+    expect(await screen.findByText('Input value = Test')).toBeTruthy()
   })
 
   test('UUID should get', async () => {
