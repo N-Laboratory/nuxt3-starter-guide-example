@@ -30,16 +30,16 @@ The minimum required functions are implemented as a template project and the ess
 This project also implement unit testing, E2E testing, and analyzing source code by SonarQube.
 
 This project implement the following.
-* Vitest (unit test)
+* TypeScript
 * EsLint (Flat Config and Stylistic)
 * Migrate to Flat Config and Stylistic
 * VeeValidate
 * Navigation guard
 * Pinia
 * Storybook
+* Vitest (unit test)
 * Puppeteer (E2E test)
 * SonarQube
-* TypeScript
 
 ## Contents
 
@@ -84,13 +84,11 @@ npm run dev
 You can access http://localhost:3000 to use this application.
 
 ## [Typescript](https://nuxt.com/docs/guide/concepts/typescript) Setup
-You may experience issues with the latest vue-tsc and vite-plugin-checker, used internally when type checking. For now, you may need to stay on v1 of vue-tsc.
-For more details, please see https://nuxt.com/docs/guide/concepts/typescript#type-checking
 ```bash
-npm install --save-dev vue-tsc@^1 typescript
+npm install --save-dev vue-tsc typescript
 ```
 
-Add typescript to nuxt.config.ts.
+Add typescript property to nuxt.config.ts.
 ```ts
 // nuxt.config.ts
 export default defineNuxtConfig({
@@ -98,20 +96,6 @@ export default defineNuxtConfig({
   typescript: {
     // Enable type-checking at build time
     typeCheck: true
-  },
-});
-```
-
-If you had installed vue-tsc v2, an error will occur like below.
-https://github.com/vuejs/language-tools/issues/3969
-
-The only solution currently is to downgrade vue-tsc v1 or try following.
-```ts
-// nuxt.config.ts
-export default defineNuxtConfig({
-  typescript: {
-    // Change typeCheck to false to avoid above error.
-    typeCheck: false
   },
 });
 ```
@@ -179,7 +163,7 @@ export default function ignores(): Linter.FlatConfig[] {
   ]
 }
 ```
-
+If the lint rule does not apply, restart nuxt server and VSCode.
 Add the following item to scripts in package.json.
 ```json
 {
@@ -219,9 +203,9 @@ Similar to the ESLint Module, you can opt-in by setting stylistic to true in the
 ```ts
 export default defineNuxtConfig({
   modules: [
-    // Add '@nuxt/eslint'
     '@nuxt/eslint'
   ],
+  // Add this
   eslint: {
     config: {
       stylistic: true
@@ -248,6 +232,7 @@ export default defineNuxtConfig({
   }
 })
 ```
+If the stylistic rules does not apply, restart nuxt server and VSCode.
 
 ### Automatically format code on save with ESLint in VSCode
 Add the following to .vscode/setting.json
@@ -301,12 +286,15 @@ import withNuxt from './.nuxt/eslint.config.mjs'
 
 export default withNuxt(
   {
+    // An array of glob patterns indicating the files that the configuration object should apply to.
     files: ['**/*.js', '**/*.ts', '**/*.vue'],
+    // An array of glob patterns indicating the files that the configuration object should not apply to.
     // Use ignores instead of --ignore-path.
     ignores: ['**/*.log*', '.cache/**'],
+    // An object containing the configured rules. When files or ignores are specified, these rule configurations are only available to the matching files.
     rules: {
-      'no-console': 'off',
-    },
+      'no-console': 'off'
+    }
   },
 )
 ```
@@ -408,8 +396,7 @@ Add the following to package.json.
 
 Use below plugin because vitest does not import function/components that auto import by Nuxt.
 ```bash
-npm install --save-dev unplugin-auto-import
-npm install --save-dev unplugin-vue-components
+npm install --save-dev unplugin-auto-import unplugin-vue-components
 ```
 Add plugins to vitest.config.ts
 ```ts
@@ -419,6 +406,7 @@ import AutoImportFunctions from 'unplugin-auto-import/vite'
 import AutoImportComponents from 'unplugin-vue-components/vite'
 
 export default defineConfig({
+  // Add this
   plugins: [
     Vue(),
     // Set plugin name you want to import. You can set preset name.
@@ -430,6 +418,7 @@ export default defineConfig({
       'pinia',
     ], dts: 'auto-imports.d.ts' }),
     AutoImportComponents({
+      // It is assumed that the source directory is changed to src directory.
       dirs: ['src/components'],
       dts: '.nuxt/components.d.ts',
     }),
@@ -485,7 +474,7 @@ Add --coverage to the following item in package.json.
 
 Add index.vue to pages directory.
 ```ts
-// pages/index.vue
+// src/pages/index.vue
 <template>
   <h1>
     Pages/index.vue
@@ -495,9 +484,10 @@ Add index.vue to pages directory.
 
 Here is a test code of index.vue.
 ```ts
+// src/tests/unitTest/pages/index.spec.ts
 import { describe, expect, test } from 'vitest'
 import { render, screen } from '@testing-library/vue'
-import Index from '../pages/index.vue'
+import Index from '~/pages/index.vue'
 
 describe('Index', () => {
   test('should render page title', () => {
@@ -541,7 +531,7 @@ npm install --save-dev vee-validate @vee-validate/i18n @vee-validate/rules
 ```
 Create vee-validate-plugin.ts in plugins directory and add the following to vee-validate-plugin.ts.
 ```ts
-// plugins/vee-validate-plugin.ts
+// src/plugins/vee-validate-plugin.ts
 import { localize } from '@vee-validate/i18n'
 import en from '@vee-validate/i18n/dist/locale/en.json'
 import { all } from '@vee-validate/rules'
@@ -681,7 +671,7 @@ See the following for more details.
 * https://github.com/testing-library/vue-testing-library/blob/main/src/__tests__/validate-plugin.js
 
 ```ts
-// form.vue
+// src/pages/form.vue
 <script lang="ts" setup>
 import { Form, Field, ErrorMessage } from 'vee-validate'
 
@@ -700,7 +690,7 @@ const foo = (values: Record<string, string>) => {
 ```
 
 ```ts
-// form.spec.ts
+// src/tests/unitTest/pages/form.spec.ts
 import { expect, test } from 'vitest'
 import { render, screen } from '@testing-library/vue'
 import userEvent from '@testing-library/user-event'
@@ -723,7 +713,7 @@ test('should error message display', async () => {
 You can implement redirect function in middleware directory.
 
 The file have different functions by setting the the following file name.
-* redirect.ts (anonymous (or inline) route middleware, which are defined directly in the pages where they are used.)
+* src/middleware/redirect.ts (anonymous (or inline) route middleware, which are defined directly in the pages where they are used.)
 ```ts
 // foo.vue
 <script setup>
@@ -732,23 +722,23 @@ definePageMeta({
 })
 </script>
 ```
-* redirect.global.ts (automatically run on every route change)
+* src/middleware/redirect.global.ts (automatically run on every route change)
 
 Here is a sample code. See [this](https://nuxt.com/docs/guide/directory-structure/middleware) for more details.
 
 
 ```ts
-// middleware/redirect.global.ts
+// src/middleware/redirect.global.ts
 export default defineNuxtRouteMiddleware((to, from) => {
-  // If you access /
-  if (to.path === '/') {
+  // If you access /foo
+  if (to.path === '/foo') {
     // Redirect to login
     return navigateTo('login')
   }
 })
 ```
 
-See [this](https://github.com/N-Laboratory/nuxt3-starter-guide/commit/967fb06c6a850534090de72ecc1da134c60251e8) for test implementation .
+See [this](https://github.com/N-Laboratory/nuxt3-starter-guide-example/blob/main/src/tests/unitTest/middleware/redirect.global.spec.ts) for test implementation .
 
 ## [Pinia](https://pinia.vuejs.org/ssr/nuxt.html) Setup
 ```bash
@@ -765,7 +755,7 @@ If you're using npm, you might encounter an ERESOLVE unable to resolve dependenc
 }
 ```
 
-If you see below error message, fix override:vue like below.
+If you see below error message, modify overrides:vue like below.
 ```bash
 npm ERR! Invalid comparator: latest
 ```
@@ -799,7 +789,7 @@ export default defineNuxtConfig({
 ### Store implementation
 Create user.ts in store directory and add the following to user.ts.
 ```ts
-// store/user.ts
+// src/store/user.ts
 // If you add defineStore to autoImports in nuxt.config.ts, you don't need to import below
 import { defineStore } from 'pinia'
 
@@ -809,7 +799,7 @@ export const useUserStore = defineStore('user', {
     user: { email: '', password: '' }
   }),
   actions: {
-    // Update use info
+    // Update user info
     setUserInfo (email: string, password: string) {
       this.user.email = email
       this.user.password = password
@@ -820,7 +810,7 @@ export const useUserStore = defineStore('user', {
 
 Here is a sample code using store from vue file.
 ```ts
-// pages/store.vue
+// src/pages/store.vue
 <script lang="ts" setup>
 import { useUserStore } from '~/store/user'
 
@@ -892,7 +882,7 @@ describe('Store', () => {
 You can set the initial state of all of your stores when creating a testing pinia by passing an initialState.
 See [this](https://pinia.vuejs.org/cookbook/testing.html#initial-state) for more details.
 ```ts
-pages/index.vue
+// src/pages/index.vue
 <script lang="ts" setup>
 import { useUserStore } from '~/store/user'
 
@@ -919,7 +909,7 @@ beforeEach(() => {
   setActivePinia(createPinia())
 })
 
-test('store user info should set the initial value', () => {
+test('should set the initial value', () => {
   // Arrange
   render(Foo, {
     global: {
