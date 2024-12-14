@@ -971,7 +971,7 @@ Without the above configurration, the follwing error will occur.
 ```
 Create the new vue file and new story like this.
 ```typescript
-// pages/index.vue
+// src/pages/index.vue
 <template>
   <div>
     Pages/index.vue
@@ -979,7 +979,7 @@ Create the new vue file and new story like this.
 </template>
 ```
 ```typescript
-// pages/index.stories.ts
+// src/pages/index.stories.ts
 import type { Meta, StoryObj } from '@storybook/vue3'
 import Index from './index.vue'
 
@@ -1043,6 +1043,7 @@ import Foo from '~/components/Foo.vue'
 
 Add an alias to viteFinal in .storybook/main.ts to avoid above error.
 ```ts
+// .storybook/main.ts
 import type { StorybookConfig } from "@storybook/vue3-vite";
 import path from "path";
 
@@ -1062,21 +1063,22 @@ const config: StorybookConfig = {
 ```
 
 ### Nuxt auto import configuration
-Storybook cannot import functions that are automatically imports by nuxt (e.g. ref, computed, and so on.).
+Storybook cannot import functions and components that are automatically imports by Nuxt.
 
-Install the following library to import nuxt auto-imports functions in storybook.
-- unplugin-auto-import
+Install the following library to import nuxt auto-imports functions and components in storybook.
 ```bash
-npm install --save-dev unplugin-auto-import
+npm install --save-dev unplugin-auto-import unplugin-vue-components
 ```
 Add the following to viteFinal in .storybook/main.ts
 ```ts
-import AutoImportFunctions from "unplugin-auto-import/vite";
+// .storybook/main.ts
+import AutoImportFunctions from "unplugin-auto-import/vite"
+import AutoImportComponents from 'unplugin-vue-components/vite'
 
 const config: StorybookConfig = {
   viteFinal: async (config) => {
     if (config?.plugins) {
-      // add this
+      // Add this
       config.plugins.push(
         AutoImportFunctions ({ imports: [
           'vue',
@@ -1085,27 +1087,7 @@ const config: StorybookConfig = {
           'pinia',
         ], dts: '.storybook/auto-imports.d.ts' }),
       )
-    }
-    return config
-  },
-}
-```
-
-Storybook cannot import components that are automatically imports by nuxt.
-
-Install the following library to import nuxt auto-imports components in storybook.
-- unplugin-vue-components
-```bash
-npm install --save-dev unplugin-vue-components
-```
-Add the following to viteFinal in .storybook/main.ts
-```ts
-import AutoImportComponents from 'unplugin-vue-components/vite'
-
-const config: StorybookConfig = {
-  viteFinal: async (config) => {
-    if (config?.plugins) {
-      // add this
+      // Add this
       config.plugins.push(
         AutoImportComponents({
           dirs: ['src/components'],
@@ -1196,8 +1178,15 @@ Object.entries(all).forEach(([name, rule]) => {
 Use msw to mock Rest and GraphQL requests right inside your story in storybook. With msw-storybook-addon, you can easily mock your APIs, making that process much simpler.
 ```bash
 npm install --save-dev msw msw-storybook-addon
+```
+
+Run the following command to generate service worker. The service worker file will be created in public directory.
+```bash
 npx msw init public/
 ```
+
+
+
 Enable MSW in Storybook by initializing MSW and providing the MSW decorator in ./storybook/preview.ts
 ```ts
 // .storybook/preview.ts
@@ -1213,6 +1202,7 @@ const preview: Preview = {
 
 export default preview
 ```
+
 Then ensure the staticDirs property in your Storybook configuration will include the generated service worker file (in /public, by default).
 ```ts
 // .storybook/main.ts
@@ -1223,7 +1213,7 @@ export default config
 ```
 Here is an example uses the fetch API to make network requests.
 ```ts
-// pages/index.vue
+// src/pages/index.vue
 <script lang="ts" setup>
 import { useFetch } from '@vueuse/core'
 
@@ -1242,7 +1232,7 @@ const handleClick = async () => {
 </template>
 ```
 ```ts
-// pages/index.stories.ts
+// src/pages/index.stories.ts
 import type { Meta, StoryObj } from '@storybook/vue3'
 import { http, HttpResponse } from 'msw'
 import Index from './index.vue'
@@ -1315,7 +1305,7 @@ export default defineWorkspace([
     plugins: [
       storybookTest({ configDir: '.storybook' }),
       storybookVuePlugin(),
-      // Import nuxt-auto-imports functions
+      // Add this to import nuxt-auto-imports functions
       AutoImportFunctions ({ imports: [
         'vue',
         'vee-validate',
@@ -1323,12 +1313,13 @@ export default defineWorkspace([
         'pinia',
       ], dts: '.storybook/auto-imports.d.ts',
       }),
-      // Import nuxt-auto-imports components
+      // Add this to import nuxt-auto-imports components
       AutoImportComponents({
         dirs: ['src/components'],
         dts: '.storybook/components.d.ts',
       }),
     ],
+    // Add this to resolve alias
     resolve: {
       alias: {
         '~': path.resolve(__dirname, './src'),
@@ -1359,7 +1350,7 @@ Add the follwing to scripts in package.json.
 
 Here is an example.
 ```ts
-// pages/index.vue
+// src/pages/index.vue
 <script lang="ts" setup>
 import { useFetch } from '@vueuse/core'
 
@@ -1378,7 +1369,7 @@ const handleClick = async () => {
 </template>
 ```
 ```ts
-// pages/index.stories.ts
+// src/pages/index.stories.ts
 import type { Meta, StoryObj } from '@storybook/vue3'
 import { http, HttpResponse } from 'msw'
 import { within, userEvent, expect } from '@storybook/test'
@@ -1407,6 +1398,7 @@ export const GetUuid: Story = {
       ],
     },
   },
+  // Add this
   play: async ({ canvasElement }) => {
     // Arrange
     const canvas = within(canvasElement)
