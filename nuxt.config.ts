@@ -4,7 +4,7 @@ export default defineNuxtConfig({
     ['@pinia/nuxt',
       {
         autoImports: [
-          // defineStoreの自動インポート
+          // imnpot defineStore
           'defineStore',
         ],
         // If you need to use vuex and pinia, add following option.
