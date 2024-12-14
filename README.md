@@ -1431,7 +1431,7 @@ Add the follwing to scripts in package.json.
 ```
 The following is an example implementation. When the email address and password are entered, the submit button is activated. This E2E test verifies whether the submit button is activated after inputting the information.
 ```ts
-// pages/foo.vue
+// src/pages/foo.vue
 <script lang="ts" setup>
 import { Form, Field } from 'vee-validate'
 </script>
