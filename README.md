@@ -1549,10 +1549,10 @@ Add the following to vitest.config.ts.
 export default defineConfig({
   test: {
     coverage: {
-      // To collect coverage by SonarQube, add lcov.
+      // Add lcov to collect coverage by SonarQube
       reporter: ['html', 'clover', 'text', 'lcov']
     },
-    // To analyze your test code by SonarQube, output test report file
+    // Add this to analyze your test code by SonarQube
     reporters: ['verbose', 'vitest-sonar-reporter'],
     outputFile: 'test-report.xml',
   }
@@ -1561,8 +1561,8 @@ export default defineConfig({
 
 Create sonar-project.properties in root directory and add the following to sonar-project.properties. See [this](https://docs.sonarqube.org/9.6/project-administration/narrowing-the-focus/) for more details.
 ```properties
-sonar.projectKey=nuxt3-starter-guide
-sonar.projectName=nuxt3-starter-guide
+sonar.projectKey=sample
+sonar.projectName=sample
 sonar.sources=src
 sonar.tests=src/tests/
 sonar.test.inclusions=src/tests/**/*.spec.ts
@@ -1586,13 +1586,13 @@ http://localhost:9000/projects/create
 
 1. Click [Create a local project]
 
-1. Input __nuxt3-starter-guide__ in Project display name and Project key. Click [Next]
+1. Input __sample__ in Project display name and Project key. Click [Next]
 
 1. Select [Use the global setting] and click [Create project]
 
 1. Click [Locally]
 
-1. Click [Generate] and then generate project token
+1. Click [Generate] and then copy the generated project token
 
 ### Analyze your source code
 Add project token to sonar.token in sonar-project.properties.
@@ -1612,9 +1612,6 @@ Add the following to scripts in package.json.
 
 Run below command to run SonarQube analysis.
 ```bash
-# run all tests
-npm run test:all
-
 # run SonarQube analysis
 npm run sonar
 ```
