@@ -11,7 +11,8 @@ export default defineNuxtConfig({
         // disableVuex: false ,
       },
     ],
-    '@nuxt/eslint', '@nuxtjs/storybook'],
+    // delete '@nuxtjs/storybook' because it is not compatible with Storybook 9
+    '@nuxt/eslint'],
   components: [
     { path: '~/components/', pathPrefix: false },
   ],
@@ -31,8 +32,9 @@ export default defineNuxtConfig({
       },
     },
   },
-  storybook: {
-    host: 'http://localhost',
-    port: 6006,
-  },
+  // delete '@nuxtjs/storybook' because it is not compatible with Storybook 9
+  // storybook: {
+  //   host: 'http://localhost',
+  //   port: 6006,
+  // },
 })

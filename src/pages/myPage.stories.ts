@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/vue3'
+import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import MyPage from './myPage.vue'
 import { useUserStore } from '~/store/user'
 
