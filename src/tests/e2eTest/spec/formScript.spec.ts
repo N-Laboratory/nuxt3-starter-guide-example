@@ -1,8 +1,8 @@
 import { afterAll, beforeAll, describe, expect, test } from 'vitest'
 import { launch } from 'puppeteer'
-import type { Browser, Page, PuppeteerLaunchOptions } from 'puppeteer'
+import type { Browser, Page, LaunchOptions } from 'puppeteer'
 
-const options: PuppeteerLaunchOptions = {
+const options: LaunchOptions = {
   headless: false,
   slowMo: 75,
   defaultViewport: {
