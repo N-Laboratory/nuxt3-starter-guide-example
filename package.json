@@ -45,7 +45,7 @@
     "sonarqube-scanner": "^4.3.0",
     "storybook": "^9.1.1",
     "typescript": "^5.9.2",
-    "unplugin-auto-import": "^19.3.0",
+    "unplugin-auto-import": "^20.0.0",
     "unplugin-vue-components": "^29.0.0",
     "vee-validate": "^4.15.1",
     "vitest": "^3.2.3",
