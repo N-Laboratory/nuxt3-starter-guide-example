@@ -37,7 +37,7 @@
     "eslint": "^9.33.0",
     "eslint-plugin-storybook": "^9.1.2",
     "happy-dom": "^18.0.1",
-    "msw": "^2.10.4",
+    "msw": "^2.10.5",
     "msw-storybook-addon": "^2.0.5",
     "nuxt": "^3.18.1",
     "playwright": "^1.54.2",
