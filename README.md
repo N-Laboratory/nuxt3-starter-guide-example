@@ -980,7 +980,7 @@ Create the new vue file and new story like this.
 ```
 ```typescript
 // src/pages/index.stories.ts
-import type { Meta, StoryObj } from '@storybook/vue3'
+import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import Index from './index.vue'
 
 type Story = StoryObj<typeof Index>
@@ -1001,7 +1001,10 @@ Run the following command to start storybook, and then you can access http://loc
 ```bash
 npm run storybook
 ```
-Install [@nuxtjs/storybook](https://storybook.nuxtjs.org/getting-started/setup) dependency to your project.
+
+Install [@nuxtjs/storybook](https://storybook.nuxtjs.org/) dependency to your project.
+
+NOTE: '@nuxtjs/storybook' is not compatible with Storybook 9. You should skip the following steps if you installed Storybook 9.
 ```bash
 npx nuxi@latest module add storybook
 ```
@@ -1050,7 +1053,7 @@ import path from "path";
 const config: StorybookConfig = {
   // add this
   viteFinal: async (config) => {
-    if (config?.resolve?.alias) {
+    if (config?.resolve) {
       config.resolve.alias = {
         ...config.resolve.alias,
         '@': path.resolve(__dirname, '../src'),
@@ -1106,10 +1109,10 @@ The following error will occur when using pinia in vue file.
 ```
 "getActivePinia()" was called but there was no active Pinia. Are you trying to use a store before calling "app.use(pinia)"?
 ```
-To aboid this, add the follwing to .storybook/preview.ts.
+To avoid this, add the follwing to .storybook/preview.ts.
 ```ts
 // .storybook/preview.ts
-import { type Preview, setup } from '@storybook/vue3'
+import { type Preview, setup } from '@storybook/vue3-vite'
 import type { App } from 'vue'
 import { createPinia } from 'pinia'
 
@@ -1122,7 +1125,7 @@ setup((app: App) => {
 
 If you want to set initial state in store, add the follwing to each story in storybook.
 ```ts
-import type { Meta, StoryObj } from '@storybook/vue3'
+import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import Index from './index.vue'
 import { useUserStore } from '~/store/user'
 
@@ -1156,7 +1159,7 @@ The following error will occur when using Vee-Validate in vue file.
 ```
 Error: No such validator 'XXXX' exists.
 ```
-To aboid this, add the follwing to .storybook/preview.ts.
+To avoid this, add the follwing to .storybook/preview.ts.
 ```ts
 // .storybook/preview.ts
 import { localize } from '@vee-validate/i18n'
@@ -1233,7 +1236,7 @@ const handleClick = async () => {
 ```
 ```ts
 // src/pages/index.stories.ts
-import type { Meta, StoryObj } from '@storybook/vue3'
+import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { http, HttpResponse } from 'msw'
 import Index from './index.vue'
 
@@ -1275,11 +1278,13 @@ initialize({
 })
 ```
 
-### Run interaction testing inside Storybook
+### Run interaction testing inside Storybook (Only Storybook version 8.X or less)
 Storybook's test addon allows you to test your components directly inside Storybook. It does this by using a Vitest plugin to transform your stories into Vitest tests using portable stories.
 
+NOTE: According to [this migration guide](https://github.com/storybookjs/storybook/blob/next/MIGRATION.md#experimental-test-addon-stabilized-and-renamed), @storybook/experimental-addon-test was changed in Storybook 9. The following is no longer available in Storybook 9.
+
 Before installing, make sure your project meets the following requirements:
-- Storybook ≥ 8.4
+- 9.0 > your Storybook ≥ 8.4
 - A Storybook framework that uses Vite (e.g. vue3-vite), or the Storybook Next.js framework
 - Vitest ≥ 2.1
 
@@ -1370,9 +1375,9 @@ const handleClick = async () => {
 ```
 ```ts
 // src/pages/index.stories.ts
-import type { Meta, StoryObj } from '@storybook/vue3'
+import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { http, HttpResponse } from 'msw'
-import { within, userEvent, expect } from '@storybook/test'
+import { within, userEvent, expect } from 'storybook/test'
 import Index from './index.vue'
 
 type Story = StoryObj<typeof Index>
@@ -1413,6 +1418,137 @@ export const GetUuid: Story = {
 ```
 Run the following command to run tests.
 ```bash
+npm run test:storybook
+```
+
+### Run interaction testing inside Storybook 9
+According to [this migration guide](https://github.com/storybookjs/storybook/blob/next/MIGRATION.md#experimental-test-addon-stabilized-and-renamed), @storybook/experimental-addon-test was changed in Storybook 9. Vitest.workspace is deprecated.
+You have to delete vitest.workspace.ts file and try the following steps.
+
+Delete vitest.workspace.ts file.
+```diff
+- import path from 'path'
+- import { defineWorkspace } from 'vitest/config'
+- import { storybookTest } from '@storybook/- experimental-addon-test/vitest-plugin'
+- import { storybookVuePlugin } from '@storybook/- vue3-vite/vite-plugin'
+- import AutoImportFunctions from 'unplugin-auto-import/vite'
+- import AutoImportComponents from 'unplugin-vue-components/vite'
+-
+- export default defineWorkspace([
+-   'vitest.config.ts',
+-   {
+-      extends: 'vite.config.ts',
+-      plugins: [
+-        storybookTest({ configDir: '.storybook' }),
+-        storybookVuePlugin(),
+-        AutoImportFunctions ({ imports: [
+-          'vue',
+-          'vee-validate',
+-          'vue-router',
+-          'pinia',
+-        ], dts: '.storybook/auto-imports.d.ts',
+-        }),
+-        AutoImportComponents({
+-          dirs: ['src/components'],
+-          dts: '.storybook/components.d.ts',
+-        }),
+-      ],
+-      resolve: {
+-        alias: {
+-          '~': path.resolve(__dirname, './src'),
+-          '@': path.resolve(__dirname, './src'),
+-        },
+-      },
+-      test: {
+-        name: 'storybook',
+-        browser: {
+-          enabled: true,
+-          headless: true,
+-          name: 'chromium',
+-          provider: 'playwright',
+-        },
+-        include: ['**/*.stories.?(m)[jt]s?(x)'],
+-        setupFiles: ['.storybook/vitest.setup.ts'],
+-      },
+-   },
+-])
+```
+
+Add the following code to vitest.config.ts.
+```diff
+// vitest.config.ts.
+import path from 'path'
+import { defineConfig } from 'vitest/config'
+import Vue from '@vitejs/plugin-vue'
+import AutoImportFunctions from 'unplugin-auto-import/vite'
+import AutoImportComponents from 'unplugin-vue-components/vite'
++ import storybookTest from '@storybook/addon-vitest/vitest-plugin'
++ import { storybookVuePlugin } from '@storybook/vue3-vite/vite-plugin'
+
+export default defineConfig({
+  test: {
+    coverage: {
+      provider: 'v8',
+      include: ['src/**/*.{vue,js,ts}'],
+      all: false,
+      reporter: ['html', 'clover', 'text', 'lcov'],
+    },
+    reporters: ['verbose', 'vitest-sonar-reporter'],
+    outputFile: 'test-report.xml',
++   projects: [
++     {
++        plugins: [
++          Vue(),
++         storybookTest({ configDir: '.storybook' }),
++         storybookVuePlugin(),
++         AutoImportFunctions({
++           imports: ['vue', 'vee-validate', 'vue-router', 'pinia'],
++           dts: '.storybook/auto-imports.d.ts',
++         }),
++         AutoImportComponents({
++           dirs: ['src/components'],
++           dts: '.storybook/components.d.ts',
++         }),
++       ],
++       resolve: {
++         alias: {
++           '~': path.resolve(__dirname, './src'),
++           '@': path.resolve(__dirname, './src'),
++         },
++       },
++       test: {
++         // You should set test name like npx vitest --project=storybook-test when run test command.
++         name: 'storybook-test',
++         browser: {
++           enabled: true,
++           headless: true,
++           provider: 'playwright',
++           instances: [
++             {
++               browser: 'chromium',
++             },
++           ],
++         },
++         setupFiles: ['.storybook/vitest.setup.ts'],
++       },
++     },
++   ],
+  },
+})
+```
+Add the follwing code to scripts in package.json. 
+```
+"scripts": {
+  "test:storybook": "vitest --project=storybook-test",
+},
+```
+
+Run the following command to run tests.
+```
+// execute this command only for the first time
+npx playwright install
+
+// execute storybook testing
 npm run test:storybook
 ```
 
@@ -1463,12 +1599,11 @@ import { Form, Field } from 'vee-validate'
 // ./src/tests/e2eTest/foo.spec.ts
 import { afterAll, beforeAll, describe, expect, test } from 'vitest'
 import { launch } from 'puppeteer'
-// If you can not import PuppeteerLaunchOptions, use LaunchOptions instead of PuppeteerLaunchOptions.
-import type { Browser, Page, PuppeteerLaunchOptions } from 'puppeteer'
+import type { Browser, Page, LaunchOptions } from 'puppeteer'
 
 // Set browser launch option. See the following for more details.
-// https://pptr.dev/api/puppeteer.browserlaunchargumentoptions
-const options: PuppeteerLaunchOptions = {
+// https://pptr.dev/api/puppeteer.launchoptions
+const options: LaunchOptions = {
   headless: false,
   slowMo: 75,
   defaultViewport: {
